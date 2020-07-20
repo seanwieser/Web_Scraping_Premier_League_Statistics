@@ -13,6 +13,6 @@ https://www.transfermarkt.us/premier-league/transfers/wettbewerb/GB1
 https://www.premierleague.com/players
 https://github.com/footballcsv/england
 ## Data Description
-Transfers: 20 teams over 19 years with 10+ transfers per team per year
-Players: ~400 players per year over 19 years with 20+ metrics per player
-Fixture results: All fixutre results over 19 years with matchday, date, home team, score, away team, notes
+1. Transfers: 20 teams over 19 years with 10+ transfers per team per year \n
+1. Players: ~400 players per year over 19 years with 20+ metrics per player \n
+1. Fixture results: All fixutre results over 19 years with matchday, date, home team, score, away team, notes
