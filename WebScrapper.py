@@ -29,9 +29,9 @@ class PlayerScrapper:
 
     def _write_list_html_from_url(self):
         url = self.str_dict['url list']
-        print(f'pulling and opening players html from url:\n{url}')
+        print(f'pulling and opening players list html from url:\n{url}')
         browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
-        browser.get(self.str_dict['url list'])
+        browser.get(url)
         time.sleep(5)
         elem = browser.find_element_by_tag_name("body")
         no_of_pagedowns = 60
@@ -47,7 +47,18 @@ class PlayerScrapper:
 
     def _write_player_html_from_url(self, player_str):
         url = self.players_url[player_str]
-        print(f'pulling and opening transfers html for:\n{player_str}\t\t{url}')
+        print(f'pulling and opening player stats html for:\n{player_str}\t\t{url}')
+        browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
+        browser.get(url)
+        time.sleep(4)
+        f = open(''.join([self.str_dict['local player'], player_str.replace(' ', '_')]), 'w')
+        f.write(browser.page_source)
+        f.close()
+        browser.close()
+    
+    '''
+    def _write_player_html_from_url(self, player_str):
+        url = self.players_url[player_str]
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0'}
         req = urllib.request.Request(url=url, headers=headers) # self request object will integrate your URL and the headers defined above
         page_html = ''
@@ -56,11 +67,12 @@ class PlayerScrapper:
         f = open(''.join([self.str_dict['local player'], player_str.replace(' ', '_')]), 'wb')
         f.write(page_html)
         f.close()
+    '''
 
     def write_player_html(self):
         self._update_str_dict()
         for player_str in self.players_url.keys():
-            if not Path(''.join([self.str_dict['local player'], player_str.replace(' ', '_')])).is_file():
+            if not Path(''.join([self.str_dict['local player'], player_str.replace(' ', '_')])).is_file() or player_str not in 'data/epl/ignored.html':
                 self._write_player_html_from_url(player_str)
 
     def get_player_html(self, player_str):
@@ -86,9 +98,16 @@ class PlayerScrapper:
         info = [[],[],[], {}]
         rows = soup.findAll('tr')
         for idx in range(1, len(rows)):
-            name = rows[idx].findAll('td')[0].findAll(text=True)[0].replace('.', '')
-            position = rows[idx].findAll('td')[1].findAll(text=True)[0]
-            nation = rows[idx].findAll('td')[2].findAll(text=True)
+            contents = rows[idx].findAll('td')
+            if len(contents[0])<1 or len(contents[1])<1 or len(contents[2])<1:
+                print(f'Ignoring {idx} in year {self.year}')
+                f = open('data/epl/ignored.html', 'w')
+                f.write(str(contents))
+                f.close()
+                continue
+            name = contents[0].findAll(text=True)[0].replace('.', '')
+            position = contents[1].findAll(text=True)[0]
+            nation = contents[2].findAll(text=True)
             player_url = ''.join([rows[idx].find('a')['href'][:38], rows[idx].find('a')['href'][38:].replace('.', '')])
             while ' ' in nation:
                 nation.remove(' ')
@@ -99,7 +118,7 @@ class PlayerScrapper:
             info[0].append(name.replace('.', ''))
             info[1].append(position)
             info[2].append(nation)
-            info[3][self.get_ascii(name)] = ''.join(['https:', self.get_ascii(player_url)]).replace('overview', 'stats')
+            info[3][self.get_ascii(name)] = ''.join(['https:', self.get_ascii(player_url), self.year_dict[self.year]]).replace('overview', 'stats?co=1&se=')
         list_df = pd.DataFrame(np.array(info[:3])).transpose().rename(columns={0: 'Name', 1: 'Position', 2: 'Nationality'})
         self.players_url = info[3]
         return list_df
