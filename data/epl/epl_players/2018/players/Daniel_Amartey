@@ -16,7 +16,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<script type="text/javascript" src="https://track.adform.net/Serving/TrackPoint/?pm=998269&amp;ADFPageName=testpl.pulselive.com&amp;ADFdivider=%7C&amp;ord=907309891917&amp;Set1=en-US%7Cen-US%7C1920x1080%7C24&amp;ADFtpmode=2&amp;itm=eyJ2YXIxIjoicHJlbWllcmxlYWd1ZS5jb20vcGxheWVycy8xMjMwNi9EYW5pZWwtQW1hcnRleS9zdGF0cyJ9&amp;loc=https%3A%2F%2Fwww.premierleague.com%2Fplayers%2F12306%2FDaniel-Amartey%2Fstats%3Fco%3D1%26se%3D210"></script><script type="text/javascript" src="https://track.adform.net/Serving/TrackPoint/?pm=998269&amp;ADFPageName=Master%20Tag&amp;ADFdivider=%7C&amp;ord=144275075001&amp;Set1=en-US%7Cen-US%7C1920x1080%7C24&amp;ADFtpmode=3&amp;loc=https%3A%2F%2Fwww.premierleague.com%2Fplayers%2F12306%2FDaniel-Amartey%2Fstats%3Fco%3D1%26se%3D210"></script><script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="//www.googletagmanager.com/gtm.js?id=GTM-MS75QT"></script><script>
+	<script type="text/javascript" src="https://track.adform.net/Serving/TrackPoint/?pm=998269&amp;ADFPageName=testpl.pulselive.com&amp;ADFdivider=%7C&amp;ord=678469208811&amp;Set1=en-US%7Cen-US%7C1920x1080%7C24&amp;ADFtpmode=2&amp;itm=eyJ2YXIxIjoicHJlbWllcmxlYWd1ZS5jb20vcGxheWVycy8xMjMwNi9EYW5pZWwtQW1hcnRleS9zdGF0cyJ9&amp;loc=https%3A%2F%2Fwww.premierleague.com%2Fplayers%2F12306%2FDaniel-Amartey%2Fstats%3Fco%3D1%26se%3D210"></script><script type="text/javascript" src="https://track.adform.net/Serving/TrackPoint/?pm=998269&amp;ADFPageName=Master%20Tag&amp;ADFdivider=%7C&amp;ord=503670367679&amp;Set1=en-US%7Cen-US%7C1920x1080%7C24&amp;ADFtpmode=3&amp;loc=https%3A%2F%2Fwww.premierleague.com%2Fplayers%2F12306%2FDaniel-Amartey%2Fstats%3Fco%3D1%26se%3D210"></script><script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="//www.googletagmanager.com/gtm.js?id=GTM-MS75QT"></script><script>
 		dataLayer = [];
 		window.RESOURCE_VERSION = 'prod/d92750e-2696';
 	</script>
@@ -96,7 +96,7 @@
 	-->
 	<meta name="format-detection" content="telephone=no">
 
-<script src="https://track.adform.net/serving/scripts/trackpoint/"></script><link rel="preload" href="https://adservice.google.com/adsid/integrator.js?domain=www.premierleague.com" as="script"><script type="text/javascript" src="https://adservice.google.com/adsid/integrator.js?domain=www.premierleague.com"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2020071601.js" async=""></script><link rel="prefetch" href="https://1c9adfebb6e96cd3b685a7c861280e32.safeframe.googlesyndication.com/safeframe/1-0-37/html/container.html"><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-37/html/container.html"></head>
+<script src="https://track.adform.net/serving/scripts/trackpoint/"></script><link rel="preload" href="https://adservice.google.com/adsid/integrator.js?domain=www.premierleague.com" as="script"><script type="text/javascript" src="https://adservice.google.com/adsid/integrator.js?domain=www.premierleague.com"></script><script src="https://securepubads.g.doubleclick.net/gpt/pubads_impl_2020071601.js" async=""></script><link rel="prefetch" href="https://064d22b6bf883c493ce314b83bdb3bbf.safeframe.googlesyndication.com/safeframe/1-0-37/html/container.html"><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-37/html/container.html"></head>
 <body>
 	<header class="masthead">
 	
@@ -375,7 +375,7 @@
 
 
     <div class="fixedContainer">
-        <a href="https://www.premierleague.com" class="u-hide-tab logoContainer" aria-label="Premier League Home Page on logo link" style="height: 230px;">
+        <a href="https://www.premierleague.com/" class="u-hide-tab logoContainer" aria-label="Premier League Home Page on logo link" style="height: 230px;">
             <svg class="logo" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 131.1 166.7" style="enable-background:new 0 0 131.1 166.7;" xml:space="preserve">
                 <style type="text/css">
                     .st0{fill:#360D3A;}
@@ -761,7 +761,7 @@
         </div>
 
         <nav class="subNav" role="menubar">
-            <ul class="showMoreEnabled">
+            <ul class="">
                         <li data-nav-index="0"><a href="/" class="  " data-link-index="0" role="menuitem">Home</a></li>
                         <li data-nav-index="1"><a href="/fixtures" class="  " data-link-index="1" role="menuitem">Fixtures</a></li>
                         <li data-nav-index="2"><a href="/results" class="  " data-link-index="2" role="menuitem">Results</a></li>
@@ -769,16 +769,16 @@
                         <li data-nav-index="4"><a href="/transfers" class="  " data-link-index="4" role="menuitem">Transfers</a></li>
                         <li data-nav-index="5"><a href="/broadcast-schedules" class="  " data-link-index="5" role="menuitem">Broadcast</a></li>
                         <li data-nav-index="6"><a href="/tickets" class="  " data-link-index="6" role="menuitem">Tickets</a></li>
-                        <li data-nav-index="7" class="hide"><a href="/clubs" class="  " data-link-index="7" role="menuitem">Clubs</a></li>
-                        <li data-nav-index="8" class="hide"><a href="/players" class="  active" data-link-index="8" role="menuitem">Players</a></li>
-                        <li data-nav-index="9" class="hide"><a href="/managers" class="  " data-link-index="9" role="menuitem">Managers</a></li>
-                        <li data-nav-index="10" class="hide"><a href="/news" class="  " data-link-index="10" role="menuitem">News</a></li>
-                        <li data-nav-index="11" class="hide"><a href="/social" class="  " data-link-index="11" role="menuitem">Social</a></li>
-                        <li data-nav-index="12" class="hide"><a href="/youth" class="  " data-link-index="12" role="menuitem">Youth</a></li>
-                        <li data-nav-index="13" class="hide"><a href="/safeguarding" class="  " data-link-index="13" role="menuitem">Safeguarding</a></li>
-                        <li data-nav-index="14" class="hide"><a href="/history" class="  " data-link-index="14" role="menuitem">History</a></li>
-                        <li data-nav-index="15" class="hide"><a href="/referees/overview" class="  " data-link-index="15" role="menuitem">Referees</a></li>
-            <li class="more"><div class="moreToggle" tabindex="0">More<span class="icn chevron-down"></span></div><ul class="moreToggleDropdown"><li data-nav-index="7"><a href="/clubs" class="  " data-link-index="7" role="menuitem">Clubs</a></li><li data-nav-index="8"><a href="/players" class="  active" data-link-index="8" role="menuitem">Players</a></li><li data-nav-index="9"><a href="/managers" class="  " data-link-index="9" role="menuitem">Managers</a></li><li data-nav-index="10"><a href="/news" class="  " data-link-index="10" role="menuitem">News</a></li><li data-nav-index="11"><a href="/social" class="  " data-link-index="11" role="menuitem">Social</a></li><li data-nav-index="12"><a href="/youth" class="  " data-link-index="12" role="menuitem">Youth</a></li><li data-nav-index="13"><a href="/safeguarding" class="  " data-link-index="13" role="menuitem">Safeguarding</a></li><li data-nav-index="14"><a href="/history" class="  " data-link-index="14" role="menuitem">History</a></li><li data-nav-index="15"><a href="/referees/overview" class="  " data-link-index="15" role="menuitem">Referees</a></li></ul></li></ul>
+                        <li data-nav-index="7" class=""><a href="/clubs" class="  " data-link-index="7" role="menuitem">Clubs</a></li>
+                        <li data-nav-index="8" class=""><a href="/players" class="  active" data-link-index="8" role="menuitem">Players</a></li>
+                        <li data-nav-index="9" class=""><a href="/managers" class="  " data-link-index="9" role="menuitem">Managers</a></li>
+                        <li data-nav-index="10" class=""><a href="/news" class="  " data-link-index="10" role="menuitem">News</a></li>
+                        <li data-nav-index="11" class=""><a href="/social" class="  " data-link-index="11" role="menuitem">Social</a></li>
+                        <li data-nav-index="12" class=""><a href="/youth" class="  " data-link-index="12" role="menuitem">Youth</a></li>
+                        <li data-nav-index="13" class=""><a href="/safeguarding" class="  " data-link-index="13" role="menuitem">Safeguarding</a></li>
+                        <li data-nav-index="14" class=""><a href="/history" class="  " data-link-index="14" role="menuitem">History</a></li>
+                        <li data-nav-index="15" class=""><a href="/referees/overview" class="  " data-link-index="15" role="menuitem">Referees</a></li>
+            <li class="more"><div class="moreToggle" tabindex="0">More<span class="icn chevron-down"></span></div><ul class="moreToggleDropdown"></ul></li></ul>
         </nav>
     </div>
 
@@ -797,7 +797,7 @@
         <a href="#!" id="advertClose" class="closeBtn">Close Advert</a>
     </nav>
 
-    <div id="div-gpt-ad-1503491171981-0" class="DFP-takeover" style="display: none;" data-google-query-id="CN_q0vOI3eoCFcPpZAodZzMDIQ"><div id="google_ads_iframe_/131332370/GeneralTakeover_0__container__" style="border: 0pt none; width: 728px; height: 90px;"></div></div>
+    <div id="div-gpt-ad-1503491171981-0" class="DFP-takeover" style="display: none;" data-google-query-id="CKmMi4K43-oCFQxzfgodrhoFmg"><div id="google_ads_iframe_/131332370/GeneralTakeover_0__container__" style="border: 0pt none; width: 728px; height: 90px;"></div></div>
 
     <script type="text/javascript">
         // GOOGLE ADS SCRIPT

@@ -27,6 +27,6 @@ def scrape_market(year, func):
 
 if __name__ == "__main__":
     p_scrapper = PlayerScrapper()
-    for year in range(2018, 2000, -1):
+    for year in range(2017, 2016, -1):
         print(f'Scraping {year}')
-        p_scrapper.execute(year)
+        p_scrapper.execute_year(year)
