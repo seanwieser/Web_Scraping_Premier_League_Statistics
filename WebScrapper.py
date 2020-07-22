@@ -320,11 +320,15 @@ class PlayerScrapper:
 
                     f = open('data/epl/epl_players/2018/mismatch.txt', 'w')
                     f.write(f'{filename}\n')
-                    f.close()    
+                    f.close()
+            player_row.append(name)
+            player_row.append(position)
+            player_row.append(appearances)
+            player_row.append(wins)
+            player_row.append(losses)
+            player_row.append(self.list_df.loc[name]['Nationality'])
             player_array.append(player_row)
             
-        #.transpose().rename(columns={0: 'Name', 1: 'Position', 2: 'Nationality'})
-        # player_array = np.array(player_array)
         player_array.pop(0)
         df = pd.DataFrame(np.array(player_array))\
             .rename(columns={0: 'Goals', 1: 'Headed Goals', 2:'Right Footed Goals', 3:'Left Footed Goals', 4:'Hit Woodwork', 
@@ -338,7 +342,8 @@ class PlayerScrapper:
                             33: 'Big Chances', 34: 'Crosses', 35: 'Cross Accuracy', 36: 'Through Balls', 37: 'Accurate Long Balls',\
                             38: 'Yellows', 39: 'Reds', 40: 'Fouls', 41: 'Offsides',\
                             42: 'Goalie Goals', 43: 'Saves', 44: 'Penalties Saved', 45: 'Punches', 46: 'High claims', 47: 'Catches',\
-                            48: 'Sweeper Clearances', 49: 'Throw Outs', 50: 'Goal Kicks'})
+                            48: 'Sweeper Clearances', 49: 'Throw Outs', 50: 'Goal Kicks',\
+                            51: 'Name', 52: 'Position', 53: 'Appearances', 54: 'Wins', 55: 'Loses', 56: 'Nationality'}).set_index('Name')
         print(df.head(100))
 
     def execute_year(self, year):
