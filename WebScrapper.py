@@ -266,6 +266,7 @@ class PlayerScrapper:
     def parse_player_htmls(self):
         player_array = [[]]
         j = -1
+        total = len(os.listdir(self.str_dict['local player']))
         for filename in os.listdir(self.str_dict['local player']):
             j += 1
             file_path = Path(''.join([self.str_dict['local player'], filename]))
@@ -309,7 +310,8 @@ class PlayerScrapper:
             player_row = []
             i, done = 0, False
             positions = ['Forward', 'Midfielder', 'Defender', 'Goalkeeper']
-            _update_progress(j, 888)
+            _update_progress(j, total, f'{filename}***************')
+            
             while not done:
                 try:
                     player_row = self._get_stats(position, normalStats)
@@ -332,10 +334,10 @@ class PlayerScrapper:
         player_array.pop(0)
         df = pd.DataFrame(np.array(player_array))\
             .rename(columns={0: 'Goals', 1: 'Headed Goals', 2:'Right Footed Goals', 3:'Left Footed Goals', 4:'Hit Woodwork', 
-                            5: 'Goals per Game', 6: 'Penalties', 7: 'Freekicks', 8: 'Shots', 9: 'Shots on Target', 10: 'Shooting Accuracy',\
+                            5: 'Goals per Match', 6: 'Penalties Scored', 7: 'Freekicks Scored', 8: 'Shots', 9: 'Shots on Target', 10: 'Shooting Accuracy',\
                             11: 'Big Chances Missed',\
                             12: 'Tackles', 13: 'Blocked Shots', 14: 'Interceptions', 15: 'Clearances', 16: 'Headed Clearances', 17: 'Tackle Success',\
-                            18: 'Recoveries', 19: 'Duels Won', 20: 'Duels Lost', 21: 'Success 5050', 22: 'Aerials Won', 23: 'Aerial Lost',\
+                            18: 'Recoveries', 19: 'Duels Won', 20: 'Duels Lost', 21: 'Successful 50/50s', 22: 'Aerials Battles Won', 23: 'Aerial Battles Lost',\
                             24: 'Clean Sheets', 25: 'Goals Conceded', 26: 'Own Goals', 27: 'Errors Lead to a Goal', 28: 'Last Man Tackles',\
                             29: 'Clearances Off the Line',\
                             30: 'Assists', 31: 'Passes', 32: 'Passes per Game',\
