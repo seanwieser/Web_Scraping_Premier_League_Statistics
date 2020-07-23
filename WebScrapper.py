@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import urllib.request
 import time
 import unicodedata
@@ -15,10 +16,11 @@ def _update_progress(count, total, suffix=''):
     filled_len = int(round(bar_len * count / float(total)))
 
     percents = round(100.0 * count / float(total), 1)
-    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+    bar = 'X' * filled_len + '_' * (bar_len - filled_len)
 
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
-    sys.stdout.flush()  # As suggested by Rom Ruben
+    sys.stdout.write('-------------------------------------------------------->\
+        [%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+    sys.stdout.flush()
 
 class PlayerScrapper:
     def __init__(self):
@@ -33,6 +35,7 @@ class PlayerScrapper:
         self.str_dict['url list'] = f'https://www.premierleague.com/players?se={self.year_dict[self.year]}'
         self.str_dict['local list'] = f'data/epl/epl_players/{self.year}/{self.year}_epl_players.html'
         self.str_dict['local player'] = f'data/epl/epl_players/{self.year}/players/'
+        self.str_dict['local year'] = f'data/epl/epl_players/{self.year}'
 
     def _make_years_dict(self):
         # Initializating map specific to players website for years 2018-2000
@@ -107,7 +110,7 @@ class PlayerScrapper:
         else:
             return unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode('utf-8')
 
-    def parse_list_html(self, html):
+    def parse_list_html_to_pandas(self, html):
         with open(self.str_dict['local list']) as fp:
             soup = BeautifulSoup(fp, 'html.parser')
         info = [[],[],[], {}]
@@ -115,7 +118,7 @@ class PlayerScrapper:
         for idx in range(1, len(rows)):
             contents = rows[idx].findAll('td')
             if len(contents[0])<1 or len(contents[1])<1 or len(contents[2])<1:
-                print(f'Ignoring {idx} in year {self.year}')
+                # print(f'Ignoring {idx} in year {self.year}')
                 f = open('data/epl/ignore/ignored.html', 'w')
                 f.write(str(contents))
                 f.close()
@@ -137,6 +140,7 @@ class PlayerScrapper:
         df_list = pd.DataFrame(np.array(info[:3])).transpose().rename(columns={0: 'Name', 1: 'Position', 2: 'Nationality'})
         self.players_url = info[3]
         self.list_df = df_list.set_index('Name')
+        
 
     def _get_attack_stats(self, position, li):
         goals_per, penalties, freekicks, shots, shots_on, shooting_acc, big_missed = [None]*7
@@ -270,10 +274,9 @@ class PlayerScrapper:
         for filename in os.listdir(self.str_dict['local player']):
             j += 1
             file_path = Path(''.join([self.str_dict['local player'], filename]))
-            with open('data/epl/ignore/ignored.html') as ignore_file:
-                if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
-                    print(f'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\tIGNORED {filename}')
-                    continue
+            if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
+                print(f'\nIGNORED {filename}\n')
+                continue
             with open(file_path) as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
             '''
@@ -284,37 +287,33 @@ class PlayerScrapper:
 
             raise
             '''
-            # Top banner 
-            name = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'name t-colour'})[0].getText()
-            number = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'number t-colour'})
-            if len(number) > 0:
-                number = number[0].getText()
-            else:
-                number = None
+            # Top banner
+            name, number = filename.replace('_', ' '), None
+            try: 
+                name = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'name t-colour'})[0].getText()
+            except:
+                pass
+            try:
+                number = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'number t-colour'})[0].getText()
+            except:
+                pass
             position = self.list_df.loc[name]['Position']
             # 'Top' stats for season
             topStats = soup.find_all('div', attrs={'class': 'topStatList'})[0].find_all('div', attrs={'class': 'topStat'})
             appearances = topStats[0].find_all('span', attrs={'class':'allStatContainer statappearances'})[0].getText()
             wins = topStats[2].find_all('span', attrs={'class':'allStatContainer statwins'})[0].getText()
             losses = topStats[3].find_all('span', attrs={'class':'allStatContainer statlosses'})[0].getText()
-            goals = 0
-            cleans = None
-            if position == 'Goalkeeper':
-                cleans = topStats[1].find_all('span', attrs={'class':'allStatContainer statclean_sheet'})[0].getText()
-            else:
-                goals = topStats[1].find_all('span', attrs={'class':'allStatContainer statgoals'})[0].getText()
-
             # Normal stats which are different for different positions
             normalStats = soup.find_all('ul', attrs={'class': 'normalStatList block-list-2 block-list-2-m block-list-padding'})[0] \
                               .find_all('li')
-            player_row = []
+            player_row = [name, self.year, position, appearances, wins, losses, self.list_df.loc[name]['Nationality']]
             i, done = 0, False
             positions = ['Forward', 'Midfielder', 'Defender', 'Goalkeeper']
-            _update_progress(j, total, f'{filename}***************')
+            _update_progress(j, total, f'********{filename}***************')
             
             while not done:
                 try:
-                    player_row = self._get_stats(position, normalStats)
+                    player_row.extend(self._get_stats(position, normalStats))
                     done = True
                 except:
                     position = positions[i]
@@ -323,37 +322,91 @@ class PlayerScrapper:
                     f = open('data/epl/epl_players/2018/mismatch.txt', 'w')
                     f.write(f'{filename}\n')
                     f.close()
-            player_row.append(name)
-            player_row.append(position)
-            player_row.append(appearances)
-            player_row.append(wins)
-            player_row.append(losses)
-            player_row.append(self.list_df.loc[name]['Nationality'])
             player_array.append(player_row)
             
         player_array.pop(0)
         df = pd.DataFrame(np.array(player_array))\
-            .rename(columns={0: 'Goals', 1: 'Headed Goals', 2:'Right Footed Goals', 3:'Left Footed Goals', 4:'Hit Woodwork', 
-                            5: 'Goals per Match', 6: 'Penalties Scored', 7: 'Freekicks Scored', 8: 'Shots', 9: 'Shots on Target', 10: 'Shooting Accuracy',\
-                            11: 'Big Chances Missed',\
-                            12: 'Tackles', 13: 'Blocked Shots', 14: 'Interceptions', 15: 'Clearances', 16: 'Headed Clearances', 17: 'Tackle Success',\
-                            18: 'Recoveries', 19: 'Duels Won', 20: 'Duels Lost', 21: 'Successful 50/50s', 22: 'Aerials Battles Won', 23: 'Aerial Battles Lost',\
-                            24: 'Clean Sheets', 25: 'Goals Conceded', 26: 'Own Goals', 27: 'Errors Lead to a Goal', 28: 'Last Man Tackles',\
-                            29: 'Clearances Off the Line',\
-                            30: 'Assists', 31: 'Passes', 32: 'Passes per Game',\
-                            33: 'Big Chances', 34: 'Crosses', 35: 'Cross Accuracy', 36: 'Through Balls', 37: 'Accurate Long Balls',\
-                            38: 'Yellows', 39: 'Reds', 40: 'Fouls', 41: 'Offsides',\
-                            42: 'Goalie Goals', 43: 'Saves', 44: 'Penalties Saved', 45: 'Punches', 46: 'High claims', 47: 'Catches',\
-                            48: 'Sweeper Clearances', 49: 'Throw Outs', 50: 'Goal Kicks',\
-                            51: 'Name', 52: 'Position', 53: 'Appearances', 54: 'Wins', 55: 'Loses', 56: 'Nationality'}).set_index('Name')
-        print(df.head(100))
+            .rename(columns={0: 'Name', 1: 'Year', 2: 'Position', 3: 'Appearances', 4: 'Wins', 5: 'Losses', 6: 'Nationality',\
+                            7: 'Goals', 8: 'Headed Goals', 9:'Right Footed Goals', 10:'Left Footed Goals', 11:'Hit Woodwork',\
+                            12: 'Goals per Match', 13: 'Penalties Scored', 14: 'Freekicks Scored', 15: 'Shots', 16: 'Shots on Target',\
+                            17: 'Shooting Accuracy', 18: 'Big Chances Missed',\
+                            19: 'Tackles', 20: 'Blocked Shots', 21: 'Interceptions', 22: 'Clearances', 23: 'Headed Clearances', 24: 'Tackle Success',\
+                            25: 'Recoveries', 26: 'Duels Won', 27: 'Duels Lost', 28: 'Successful 50/50s', 29: 'Aerials Battles Won',\
+                            30: 'Aerial Battles Lost', 31: 'Clean Sheets', 32: 'Goals Conceded', 33: 'Own Goals', 34: 'Errors Lead to a Goal',\
+                            35: 'Last Man Tackles', 36: 'Clearances Off the Line',\
+                            37: 'Assists', 38: 'Passes', 39: 'Passes per Game',\
+                            40: 'Big Chances', 41: 'Crosses', 42: 'Cross Accuracy', 43: 'Through Balls', 44: 'Accurate Long Balls',\
+                            45: 'Goalie Goals', 46: 'Yellows', 47: 'Reds', 48: 'Fouls', 49: 'Offsides',\
+                            50: 'Saves', 51: 'Penalties Saved', 52: 'Punches', 53: 'High claims', 54: 'Catches',\
+                            55: 'Sweeper Clearances', 56: 'Throw Outs', 57: 'Goal Kicks'})
+        csv_file_path = ''.join([self.str_dict['local year'], f'/{self.year}_df.csv'])
+        if Path(csv_file_path).is_file():
+            f = open(csv_file_path, "w+").close()
+        df.to_csv(csv_file_path)
 
-    def execute_year(self, year):
+    def get_df(self, overwrite=False):
+        csv_file_path = ''.join([self.str_dict['local year'], f'/{self.year}_df.csv'])
+
+        if not Path(csv_file_path).is_file() or overwrite:
+            self.parse_player_htmls()
+        return pd.read_csv(csv_file_path)
+    
+    def execute_year_to_pandas(self, year):
         self.year = year
         self.write_list_html()
-        self.parse_list_html(self.get_list_html())
+        self.parse_list_html_to_pandas(self.get_list_html())
         self.write_player_html()
-        players_df = self.parse_player_htmls()
+        return self.get_df()
+
+    def collect_all_names(self, dfs):
+        names = []
+        for df in dfs.values():
+            for name in df['Name']:
+                names.append(name)
+        return names
+
+    def contruct_master_df(self, start_year, stop_year, filter=False):
+        dfs = {}
+        for year in range(start_year, stop_year+1):
+            print(f'Scraping {year}')
+            df = self.execute_year_to_pandas(year)
+            if filter:
+                df = df[df['Appearances']!=0]
+            dfs[year] = df
+
+        return dfs
+
+
+class DataAnalyzer:
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def diversity(cls, start_year, stop_year):
+        dfs = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=True)
+
+        country_values = []
+        for idx, df in enumerate(dfs.values()):
+            country_values.append(df.groupby(by='Nationality').count()['Name'].reset_index().to_numpy())
+
+            
+        print(len(country_values))
+                
+        '''        
+        total = len(country_year_lst)
+        fig, axes = plt.subplots(total, 1)
+        for idx, ax in enumerate(axes):
+            countries = list(country_year_lst[idx].keys())
+            values = list(country_year_lst[idx].values())
+            ax.bar(countries, values)
+        fig.show()
+        '''
+
+
+    
+        
+
+    
 
 '''   
 
