@@ -10,6 +10,8 @@ import time
 import unicodedata
 import os
 import sys
+import datapackage
+
 
 def _update_progress(count, total, suffix=''):
     bar_len = 60
@@ -366,48 +368,142 @@ class PlayerScrapper:
         return names
 
     def contruct_master_df(self, start_year, stop_year, filter=False):
-        dfs = {}
+        df_master = pd.DataFrame()
         for year in range(start_year, stop_year+1):
             print(f'Scraping {year}')
             df = self.execute_year_to_pandas(year)
             if filter:
                 df = df[df['Appearances']!=0]
-            dfs[year] = df
+            df_master = pd.concat([df_master, df])
 
-        return dfs
+        return df_master
 
 
 class DataAnalyzer:
-    def __init__(self):
-        pass
+    def __init__(self, start_year, stop_year):
+        self.df_master = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=True)
+
     
-    @classmethod
-    def diversity(cls, start_year, stop_year):
-        dfs = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=True)
+    def _diversity_indiv(self):
+        country_values = self.df_master.groupby(by=['Year', 'Nationality']).count()['Name'].reset_index()\
+        .rename(columns={'Name': 'Count'}).sort_values(by='Nationality').set_index(['Nationality', 'Year'])
+        df_diversity = self.df_master.groupby(by='Year').count()['Name'].reset_index()\
+            .rename(columns={'Name': 'Total Count'}).sort_values(by='Year')
+        england = country_values.loc['England', :].rename(columns={'Count': 'England Prop'}).sort_values(by='Year')
+        spain = country_values.loc['Spain', :].rename(columns={'Count': 'Spain Prop'}).sort_values(by='Year')
+        france = country_values.loc['France', :].rename(columns={'Count': 'France Prop'}).sort_values(by='Year')
+        usa = country_values.loc['United States', :].rename(columns={'Count': 'USA Prop'}).sort_values(by='Year')
+        ireland = country_values.loc['Ireland', :].rename(columns={'Count': 'Ireland Prop'}).sort_values(by='Year')
+        brazil = country_values.loc['Brazil', :].rename(columns={'Count': 'Brazil Prop'}).sort_values(by='Year')
+        netherlands = country_values.loc['Netherlands', :].rename(columns={'Count': 'Netherlands Prop'}).sort_values(by='Year')
+        argentina = country_values.loc['Argentina', :].rename(columns={'Count': 'Argentina Prop'}).sort_values(by='Year')
+        wales = country_values.loc['Wales', :].rename(columns={'Count': 'Wales Prop'}).sort_values(by='Year')
+        scotland = country_values.loc['Scotland', :].rename(columns={'Count': 'Scotland Prop'}).sort_values(by='Year')
+        dfs = [england, spain, france, usa, ireland, brazil, netherlands, argentina, wales, scotland]
 
-        country_values = []
-        for idx, df in enumerate(dfs.values()):
-            country_values.append(df.groupby(by='Nationality').count()['Name'].reset_index().to_numpy())
+        for df in dfs:
+            df_diversity = pd.merge(df_diversity, df, on='Year')
+        cols = ['England Prop','Spain Prop', 'France Prop', 'USA Prop', 'Ireland Prop',\
+             'Brazil Prop', 'Netherlands Prop', 'Argentina Prop', 'Wales Prop', 'Scotland Prop']
+        df_diversity.loc[:, cols] = df_diversity.loc[:, cols].div(df_diversity['Total Count'], axis=0)
 
-            
-        print(len(country_values))
-                
-        '''        
-        total = len(country_year_lst)
-        fig, axes = plt.subplots(total, 1)
-        for idx, ax in enumerate(axes):
-            countries = list(country_year_lst[idx].keys())
-            values = list(country_year_lst[idx].values())
-            ax.bar(countries, values)
+        plt.style.use('cap1')
+        fig, ax = plt.subplots()
+        width = 0.5
+        running_bottom = 0
+        ax.bar(df_diversity['Year'], df_diversity['England Prop'], width=width, color='k', label='England')
+        running_bottom = df_diversity['England Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Wales Prop'], width=width, color=(100/255.0, 100/255.0, 100/255.0, 1), label='Wales', bottom=running_bottom)
+        running_bottom += df_diversity['Wales Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Scotland Prop'], width=width, color=(175/255.0, 175/255.0, 175/255.0, 1), label='Scotland', bottom=running_bottom)
+        running_bottom += df_diversity['Scotland Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Ireland Prop'], width=width, color='g', label='Ireland', bottom=running_bottom)
+        running_bottom += df_diversity['Ireland Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Spain Prop'], width=width, color='y', label='Spain', bottom=running_bottom)
+        running_bottom += df_diversity['Spain Prop']
+        ax.bar(df_diversity['Year'], df_diversity['France Prop'], width=width, color='b', label='France', bottom=running_bottom)
+        running_bottom += df_diversity['France Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Netherlands Prop'], width=width, color=(127/255.0, 0, 255/255.0, 1), label='Netherlands', bottom=running_bottom)
+        running_bottom += df_diversity['Netherlands Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Brazil Prop'], width=width, color=(255/255.0, 128/255.0, 0, 1), label='Brazil', bottom=running_bottom)
+        running_bottom += df_diversity['Brazil Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Argentina Prop'], width=width, color=(123/255.0, 255/255.0, 255/255.0, 1), label='Argentina', bottom=running_bottom)
+        running_bottom += df_diversity['Argentina Prop']
+        ax.bar(df_diversity['Year'], df_diversity['USA Prop'], width=width, color='r', label='United States', bottom=running_bottom)
+        ax.legend()
+        ax.set_ylim(0, 1.0)
+        ax.set_yticks(np.arange(0, 1, 0.05))
+        ax.set_xticks(np.arange(2006, 2019, 1))
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Proportion of EPL')
         fig.show()
-        '''
+
+    def _which_continent(self, row):
+        eu_countries = pd.read_csv('data/bin/listofeucountries.csv')
+        latin_countries = pd.read_csv('data/bin/list-latin-american-countries.csv')
+        north_countries = pd.read_csv('data/bin/list-north-american-countries.csv')
+        african_countries = pd.read_csv('data/bin/list-african-countries.csv')
+        asian_countries = pd.read_csv('data/bin/list-countries-asia.csv')
+        continent_dfs = [eu_countries, latin_countries, north_countries, african_countries, asian_countries]
+        map_idx = {0: 'Europe', 1: 'South America', 2: 'North America', 3: 'Africa', 4: 'Asia', 5: 'Other'}
+        if row['Nationality']=="Cote D'Ivoire":
+            return map_idx[3]
+        for idx, continent_df in enumerate(continent_dfs):
+            if continent_df['x'].isin([row['Nationality']]).any():
+                return map_idx[idx]
+        return map_idx[5]
 
 
-    
+    def _diversity_continent(self):
+        # pd.set_option('display.max_rows', None)
+
+
+        country_values = self.df_master.groupby(by=['Nationality', 'Year']).count()['Name'].reset_index()\
+        .rename(columns={'Name': 'Count'}).sort_values(by='Nationality').reset_index()[['Nationality', 'Year', 'Count']]
+        country_values['Continent'] = country_values.apply(self._which_continent, axis=1)
+        country_values = country_values.groupby(by=['Continent', 'Year']).sum()['Count'].reset_index().set_index(['Continent', 'Year'])
+        df_diversity = self.df_master.groupby(by='Year').count()['Name'].reset_index()\
+            .rename(columns={'Name': 'Total Count'}).sort_values(by='Year')
+
+        europe = country_values.loc['Europe', :].rename(columns={'Count': 'Europe Prop'}).sort_values(by='Year')
+        latin = country_values.loc['South America', :].rename(columns={'Count': 'South America Prop'}).sort_values(by='Year')
+        north = country_values.loc['North America', :].rename(columns={'Count': 'North America Prop'}).sort_values(by='Year')
+        africa = country_values.loc['Africa', :].rename(columns={'Count': 'Africa Prop'}).sort_values(by='Year')
+        asia = country_values.loc['Asia', :].rename(columns={'Count': 'Asia Prop'}).sort_values(by='Year')
+        other = country_values.loc['Other', :].rename(columns={'Count': 'Other Prop'}).sort_values(by='Year')
+        dfs = [europe, latin, north, africa, asia, other]
+
+        for df in dfs:
+            df_diversity = pd.merge(df_diversity, df, on='Year')
+        cols = ['Europe Prop','South America Prop', 'North America Prop', 'Africa Prop', 'Asia Prop', 'Other Prop']
+        df_diversity.loc[:, cols] = df_diversity.loc[:, cols].div(df_diversity['Total Count'], axis=0)
+        plt.style.use('cap1')
+        fig, ax = plt.subplots()
+        width = 0.5
+        running_bottom = 0
+        ax.bar(df_diversity['Year'], df_diversity['Europe Prop'], width=width, color='b', label='Europe')
+        running_bottom = df_diversity['Europe Prop']
+        ax.bar(df_diversity['Year'], df_diversity['South America Prop'], width=width, color='g', label='South America', bottom=running_bottom)
+        running_bottom += df_diversity['South America Prop']
+        ax.bar(df_diversity['Year'], df_diversity['North America Prop'], width=width, color='r', label='North America', bottom=running_bottom)
+        running_bottom += df_diversity['North America Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Africa Prop'], width=width, color='k', label='Africa', bottom=running_bottom)
+        running_bottom += df_diversity['Africa Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Asia Prop'], width=width, color='y', label='Asia', bottom=running_bottom)
+        running_bottom += df_diversity['Asia Prop']
+        ax.bar(df_diversity['Year'], df_diversity['Other Prop'], width=width, color='m', label='Other', bottom=running_bottom)
+        ax.legend(framealpha=0.8)
+        ax.set_ylim(0, 1.0)
+        ax.set_yticks(np.arange(0, 1, 0.05))
+        ax.set_xticks(np.arange(2006, 2019, 1))
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Proportion of EPL')
+        fig.show()
+
+    def diversity(self):
+        self._diversity_continent()
         
-
-    
-
+        
 '''   
 
 class TransferScrapper:

@@ -1,4 +1,4 @@
 from WebScrapper import *
 
 if __name__ == "__main__":
-    DataAnalyzer.diversity(2006, 2018) #inclusive on both boundaries
+    DataAnalyzer(2006, 2018).diversity() #inclusive on both boundaries
