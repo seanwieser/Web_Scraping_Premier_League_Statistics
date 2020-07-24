@@ -5,9 +5,9 @@ Capstone 1 Project for Galvanize Data Science Immersive
 
 ## **Topics**:
 Various visualizations and analyses of English Premier League players from 2000-2018
-
+___
 ## **Data Collection and Organization**
----
+
 I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
 
 The pipeline occurs in the following fashion:
@@ -79,6 +79,6 @@ The pipeline occurs in the following fashion:
         * 'Yellows', 'Reds', 'Fouls', 'Offsides'
     1. Goalkeeping
         * 'Goalie Goals', 'Saves', 'Penalties Saved', 'Punches', 'High claims', 'Catches', 'Sweeper Clearances', 'Throw Outs', 'Goal Kicks'
-        
+___
 
 
