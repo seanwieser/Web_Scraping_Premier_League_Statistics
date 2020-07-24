@@ -84,8 +84,8 @@ ___
 ## **Data Visualization and Analyses**
 
 ### Diversity of Nationality in EPL
-![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/diversity_indiv.png) "Individual Countries"]
-![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/diversity_continent.png) "Continents"
+![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/diversity_indiv.png "Individual Countries")
+![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/diversity_continent.png "Continents")
 
 
 
