@@ -45,13 +45,13 @@ class PlayerScrapper:
 
     def _update_str_dict(self):
         self.str_dict['url list'] = f'https://www.premierleague.com/players?se={self.year_dict[self.year]}'
-        self.str_dict['local list'] = f'data/epl/epl_players/{self.year}/{self.year}_epl_players.html'
-        self.str_dict['local player'] = f'data/epl/epl_players/{self.year}/players/'
-        self.str_dict['local player year'] = f'data/epl/epl_players/{self.year}'
+        self.str_dict['local list'] = f'../data/epl/epl_players/{self.year}/{self.year}_epl_players.html'
+        self.str_dict['local player'] = f'../data/epl/epl_players/{self.year}/players/'
+        self.str_dict['local player year'] = f'../data/epl/epl_players/{self.year}'
         self.str_dict['url club'] = f'https://www.premierleague.com/clubs?se={self.year_dict[self.year]}'
-        self.str_dict['local club list'] = f'data/epl/epl_clubs/{self.year}/{self.year}_epl_clubs.html'
-        self.str_dict['local club'] = f'data/epl/epl_clubs/{self.year}/clubs/'
-        self.str_dict['local club year'] = f'data/epl/epl_clubs/{self.year}'
+        self.str_dict['local club list'] = f'../data/epl/epl_clubs/{self.year}/{self.year}_epl_clubs.html'
+        self.str_dict['local club'] = f'../data/epl/epl_clubs/{self.year}/clubs/'
+        self.str_dict['local club year'] = f'../data/epl/epl_clubs/{self.year}'
 
     def _make_years_dict(self):
         # Initializating map specific to players website for years 2018-2000
@@ -77,7 +77,7 @@ class PlayerScrapper:
         for player_str in self.players_url.keys():
             player_str = self.get_ascii(player_str)
             test = Path(''.join([self.str_dict['local player'], player_str.replace(' ', '_')])).is_file()
-            if not test and player_str not in 'data/epl/ignore/ignored.html':
+            if not test and player_str not in '../data/epl/ignore/ignored.html':
                 print(test)
                 print(''.join([self.str_dict['local player'], player_str.replace(' ', '_')]))
                 self._write_player_html_from_url(player_str)
@@ -226,7 +226,7 @@ class PlayerScrapper:
                 continue
             j += 1
             file_path = Path(''.join([self.str_dict['local player'], filename]))
-            if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
+            if Path(''.join(['../data/epl/ignore/', filename, '_', str(self.year)])).is_file():
                 print(f'\nIGNORED {filename}\n')
                 continue
             with open(file_path) as fp:
@@ -264,12 +264,12 @@ class PlayerScrapper:
                     position = positions[i]
                     i+=1
 
-                    f = open('data/epl/epl_players/2018/mismatch.txt', 'w')
+                    f = open('../data/epl/epl_players/2018/mismatch.txt', 'w')
                     f.write(f'{filename}\n')
                     f.close()
             player_array.append(player_row)
 
-        with open(f'data/epl/epl_players/{self.year}/{self.year}_files_to_delete.txt', 'w') as f:
+        with open(f'../data/epl/epl_players/{self.year}/{self.year}_files_to_delete.txt', 'w') as f:
             for filename in files_to_delete: 
                 f.write(f'{filename}\n')
 
@@ -351,7 +351,7 @@ class PlayerScrapper:
         self._update_str_dict()
         for club_str in self.clubs_url.keys():
             test = Path(''.join([self.str_dict['local club'], club_str.replace(' ', '_')])).is_file()
-            if not test and club_str not in 'data/epl/ignore/ignored.html':
+            if not test and club_str not in '../data/epl/ignore/ignored.html':
                 self._write_club_html_from_url(club_str)
 
     def parse_club_htmls(self):
@@ -424,11 +424,11 @@ class PlayerScrapper:
         return 'Unknown' 
 
     def clean_nation_col(self, col):
-        eu_countries = pd.read_csv('data/bin/listofeucountries.csv')
-        latin_countries = pd.read_csv('data/bin/list-latin-american-countries.csv')
-        north_countries = pd.read_csv('data/bin/list-north-american-countries.csv')
-        african_countries = pd.read_csv('data/bin/list-african-countries.csv')
-        asian_countries = pd.read_csv('data/bin/list-countries-asia.csv')
+        eu_countries = pd.read_csv('../data/bin/listofeucountries.csv')
+        latin_countries = pd.read_csv('../data/bin/list-latin-american-countries.csv')
+        north_countries = pd.read_csv('../data/bin/list-north-american-countries.csv')
+        african_countries = pd.read_csv('../data/bin/list-african-countries.csv')
+        asian_countries = pd.read_csv('../data/bin/list-countries-asia.csv')
         continent_dfs = [eu_countries, latin_countries, north_countries, african_countries, asian_countries]
 
         for continent in continent_dfs:
@@ -449,7 +449,7 @@ class PlayerScrapper:
         return year_df
 
     def contruct_master_df(self, start_year, stop_year, filter):
-        csv_file_path = 'data/epl/master_df.csv'
+        csv_file_path = '../data/epl/master_df.csv'
         df_master = 0
         if not Path(csv_file_path).is_file():
             df_master = pd.DataFrame()
@@ -516,11 +516,11 @@ class DataAnalyzer:
         fig.show()
 
     def _which_continent(self, row):
-        eu_countries = pd.read_csv('data/bin/listofeucountries.csv')
-        latin_countries = pd.read_csv('data/bin/list-latin-american-countries.csv')
-        north_countries = pd.read_csv('data/bin/list-north-american-countries.csv')
-        african_countries = pd.read_csv('data/bin/list-african-countries.csv')
-        asian_countries = pd.read_csv('data/bin/list-countries-asia.csv')
+        eu_countries = pd.read_csv('../data/bin/listofeucountries.csv')
+        latin_countries = pd.read_csv('../data/bin/list-latin-american-countries.csv')
+        north_countries = pd.read_csv('../data/bin/list-north-american-countries.csv')
+        african_countries = pd.read_csv('../data/bin/list-african-countries.csv')
+        asian_countries = pd.read_csv('../data/bin/list-countries-asia.csv')
         continent_dfs = [eu_countries, latin_countries, north_countries, african_countries, asian_countries]
         map_idx = {0: 'Europe', 1: 'South America', 2: 'North America', 3: 'Africa', 4: 'Asia', 5: 'Other'}
         if row['Nationality']=="Cote D'Ivoire":
