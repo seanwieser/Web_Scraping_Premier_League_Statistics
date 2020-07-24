@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib._color_data as mcd
+import scipy.stats as stats
 import urllib.request
 import time
 import unicodedata
@@ -618,6 +619,33 @@ class DataAnalyzer:
         ax.legend()
         fig.show()
 
+    def stat_hyp_test(self, positions, stat, minimum=1):
+        fig, ax = plt.subplots()
+        dists = []
+        for position in positions:
+            x = self.df_master[self.df_master['Position']==position]
+            x = x[[stat, 'Appearances']]
+            x = x[x['Appearances']>=minimum]
+            x.loc[:, stat] = x.loc[:, stat].div(x['Appearances'], axis=0)
+            x = x[stat]
+            sample_means = self.sample(x)
+            ax.hist(sample_means, bins = 100, label=position, alpha=0.5)
+            dists.append(sample_means)
+        print(stats.ttest_ind(dists[0], dists[1])[1])
+        ax.legend()
+        ax.title.set_text('Sampling Distributions of Assists per Appearance')
+        ax.set_xlabel('Assists per Appearance')
+        fig.show()
+
+    def sample(self, data, samplesize=30, n_samples=100_000):
+        means = []
+        for i in range(n_samples):
+            sample = np.random.choice(data, size=samplesize, replace=True)
+            means.append(np.mean(sample))
+        return means
+        
+            
+
     def goal_t_test(self):
         forward_goals = self.df_master[self.df_master['Position']=='Forward']['Goals'].to_numpy()
         midfield_goals = self.df_master[self.df_master['Position']=='Midfielder']['Goals'].to_numpy()
@@ -632,4 +660,3 @@ class DataAnalyzer:
         axes[0].hist(forward_means, bins=30, density=True)
         axes[1].hist(midfield_means, bins=30, density=True)
         fig.show()
-
