@@ -12,13 +12,13 @@ I created the data set I used entirely by webscrapping. I encapsulated all metho
 The pipeline occurs in the following fashion:
 ### 1. **Club List**
 * This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
-        1. Get HTML
-            * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
-            * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
-            * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
-        2. Parse Club List HTML
-            * Used BeautifulSoup to extract club/url key/value pairs from local HTML file
-            * Saved this information as a dictionary in a class variable to be accessed later
+    1. Get HTML
+        * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
+        * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
+        * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
+    2. Parse Club List HTML
+        * Used BeautifulSoup to extract club/url key/value pairs from local HTML file
+        * Saved this information as a dictionary in a class variable to be accessed later
             
 ### 1. **Club**
 * This step provided a player list for a club with Name, Position, and Nationality along with URLs to player page
