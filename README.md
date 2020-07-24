@@ -89,7 +89,10 @@ ___
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/assist_goal_forward_mid_10.png)
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/samps_2.png)
 
+sample size = 30
+number of samples = 1000
 H0: mean(Forward) = mean(Midfielder)
+
 HA: mean(Forward) != mean(Midfielder)
 
 pvalue=0.43
