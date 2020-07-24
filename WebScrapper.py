@@ -466,7 +466,7 @@ class PlayerScrapper:
 
 class DataAnalyzer:
     def __init__(self, start_year, stop_year):
-        self.df_master = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=False).reset_index().drop(labels='index', axis=1)
+        self.df_master = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=True).reset_index().drop(labels='index', axis=1)
     
     def print_df(self):
         print(self.df_master.columns)
@@ -577,19 +577,44 @@ class DataAnalyzer:
             self._diversity_indiv()
             self._diversity_continent()
 
-    def plot_multi_scatter(self, position_lst, stat_x, stat_y):
+    def plot_multi_scatter(self, position_lst, stat_x, stat_y, alpha=0.5, top=True, avgs=True, per=False, minimum=0):
         fig, ax = plt.subplots()
-        top = 0
-        for position in position_lst:
-            x = self.df_master[self.df_master['Position']==position][stat_x].to_numpy()
-            y = self.df_master[self.df_master['Position']==position][stat_y].to_numpy()
-            top = np.max(np.maximum(x, y))
-            ax.scatter(x, y, alpha=0.4, label=position)
+        top_num = 0
+        colors = ['r', 'b', 'g', 'k']
+        for idx, position in enumerate(position_lst):
+            x = self.df_master[self.df_master['Position']==position]
+            y = self.df_master[self.df_master['Position']==position]
+            if not per:
+                x = x[stat_x].to_numpy()
+                y = y[stat_y].to_numpy()
+            else:
+                x = x[[stat_x, 'Appearances']]
+                y = y[[stat_y, 'Appearances']]
+                x = x[x['Appearances']>=minimum]
+                y = y[y['Appearances']>=minimum]
+                print(x)
+                print(y)
+                x.loc[:, stat_x] = x.loc[:, stat_x].div(x['Appearances'], axis=0)
+                y.loc[:, stat_y] = y.loc[:, stat_y].div(x['Appearances'], axis=0)
+                x, y = x[stat_x], y[stat_y]                           
+            if avgs:
+                avg_x, avg_y = np.mean(x), np.mean(y)
+                ax.axvline(avg_x, color=colors[idx], alpha=0.4)
+                ax.axhline(avg_y, color=colors[idx], alpha=0.4)
+
+            if top and np.max(np.maximum(x, y))>top_num:
+                top_num = np.max(np.maximum(x, y))
+            ax.scatter(x, y, alpha=0.4, label=position, color=colors[idx])
         ax.set_xlabel(stat_x)
         ax.set_ylabel(stat_y)
-        ax.set_xlim(-1, top+1)
-        ax.set_ylim(-1, 20)
-        ax.title.set_text(f'{stat_y} vs. {stat_x}')
+        if top:
+            ax.set_xlim(0, top_num+top_num/10.0)
+            ax.set_ylim(0, top_num+top_num/10.0)
+        suffix = ''
+        if per:
+            suffix = 'Per Appearance'
+
+        ax.title.set_text(f'{stat_y} vs. {stat_x} {suffix} (Minimum {minimum} Appearance(s))')
         ax.legend()
         fig.show()
 
@@ -608,44 +633,3 @@ class DataAnalyzer:
         axes[1].hist(midfield_means, bins=30, density=True)
         fig.show()
 
-
-
-
-        
-
-
-'''   
-
-class TransferScrapper:
-    def __init__(self):
-        self.year = 2000
-        self.str_dict = {'url': '', 'local path': ''}
-        self._update_str_dict()
-
-    def _update_str_dict(self):
-        self.str_dict['url'] = f'https://www.transfermarkt.us/premier-league/transfers/wettbewerb/GB1/plus/?saison_id={self.year}&s_w=&leihe=0&intern=0&intern=1'
-        self.str_dict['local path']= f'data/epl/epl_transfers/{self.year}_epl_transfers.html'
-
-    def _write_html_from_url(self):
-        url = self.str_dict['url']
-        print(f'pulling and opening transfers html from url:\n{url}')
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0'}
-        req = urllib.request.Request(url=self.str_dict['url'], headers=headers) # self request object will integrate your URL and the headers defined above
-        page_html = ''
-        with urllib.request.urlopen(req) as response:
-            page_html = response.read()
-        f = open(self.str_dict['local path'], 'wb')
-        f.write(page_html)
-        f.close()
-
-    def change_year(self, new_year):
-        self.year = new_year
-        self._update_str_dict()
-
-    def html(self, year):
-        self.year = year
-        self._update_str_dict()
-        if not Path(self.str_dict['local path']).is_file():
-            self._write_html_from_url()
-        return open(self.str_dict['local path'])
-        '''
