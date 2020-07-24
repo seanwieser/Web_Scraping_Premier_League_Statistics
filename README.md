@@ -90,7 +90,9 @@ ___
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/samps_2.png)
 
 sample size = 30
+
 number of samples = 1000
+
 H0: mean(Forward) = mean(Midfielder)
 
 HA: mean(Forward) != mean(Midfielder)
