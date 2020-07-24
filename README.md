@@ -11,6 +11,7 @@ I created the data set I used entirely by webscrapping. I encapsulated all metho
 The pipeline occurs in the following fashion:
 ### 1. **Club List**
    * This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
+   
         1. Get HTML
             * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
             * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
