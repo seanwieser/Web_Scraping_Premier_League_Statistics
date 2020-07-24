@@ -22,22 +22,36 @@ The pipeline occurs in the following fashion:
         * Saved this information as a dictionary in a class variable to be accessed later
             
 ### 1. **Club**
-* This step provided a player list and URLS for a club competing in the EPL for that particular year
+* This step provided a player list and URLS for each of the twenty clubs competing in the EPL for that particular year
 * Created a Pandas Dataframe with Name, Year, Position, and Nationality and wrote it to a CSV file
     
     1. Get Club HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
-        * Saved HTML to "data/epl/epl_clubs/year/clubs/club
+        * Saved HTMLs to "data/epl/epl_clubs/year/clubs/club"
         * Example of webpage: [Club](https://www.premierleague.com/clubs/10/Liverpool/squad?se=210)
     1. Parse Club HTMLs
         * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
         * Constructed Pandas Dataframe with information available on this page about a particular player
             * Name, Year, Position, Nationality
+            
+### 1. **Player**
+* This step provided statistics about an individual player for a particular year
+* Created a Pandas Dataframe with 55 columns and wrote it to a CSV file
+    
+    1. Get Player HTMLs
+        * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
+        * Saved HTMLs to "data/epl/epl_players/year/players/player"
+        * Example of Goalkeeper webpage: [Goalkeeper](https://www.premierleague.com/players/4664/Hugo-Lloris/stats?co=1&se=210)
+        * Example of Defender webpage: [Defender](https://www.premierleague.com/players/5140/Virgil-van-Dijk/stats?co=1&se=210)
+        * Example of Midfielder webpage: [Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
+        * Example of Forward webpage: [Forward](https://www.premierleague.com/players/4328/Sergio-Ag%C3%BCero/stats?co=1&se=210)
+    1. Parse Player HTMLs
+        * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
+        * Saved this information as a dictionary in a class variable to be accessed later
+        * Constructed Pandas Dataframe with information available on this page about a particular player
+            * Name, Year, Position, Nationality
 
-1. Write Player HTMLs
-
-1. Parse Player HTMLs
 
 1. Merge Dataframes
 
