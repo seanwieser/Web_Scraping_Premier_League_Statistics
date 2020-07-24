@@ -12,7 +12,6 @@ import time
 import unicodedata
 import os
 import sys
-import datapackage
 
 
 def _update_progress(count, total, suffix=''):
@@ -385,7 +384,6 @@ class PlayerScrapper:
                                     .replace('overview', 'stats')
                     if player_name not in self.players_url:
                         self.players_url[player_name] = player_url               
-            # _update_progress(j, total, f'********{filename}***************************')
         club_array.pop(0)
         club_df = pd.DataFrame(np.array(club_array).reshape(-1, 5)).rename(columns={\
             0: 'Name', 1: 'Club', 2: 'Year', 3: 'Position', 4: 'Nationality'})
@@ -401,12 +399,10 @@ class PlayerScrapper:
         return pd.read_csv(csv_file_path)
 
     def _execute_player_year_to_pandas(self):
-
         self.write_player_html()
         player_df = self.get_player_df()
         player_df['Position'] = player_df['Position'].apply(self.clean_position_col)
         player_df['Nationality'] = player_df['Nationality'].apply(self.clean_nation_col)
-
         player_df.drop(labels='Unnamed: 0', axis=1, inplace=True)
         return player_df
 
@@ -470,8 +466,11 @@ class PlayerScrapper:
 
 class DataAnalyzer:
     def __init__(self, start_year, stop_year):
-        self.df_master = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=True).reset_index()
+        self.df_master = PlayerScrapper().contruct_master_df(start_year, stop_year, filter=False).reset_index().drop(labels='index', axis=1)
     
+    def print_df(self):
+        print(self.df_master.columns)
+
     def _diversity_indiv(self):
         df_diversity = self.df_master.groupby(by='Year').count()['Name'].reset_index()\
             .rename(columns={'Name': 'Total Count'}).sort_values(by='Year')
@@ -500,6 +499,7 @@ class DataAnalyzer:
                 color = 'b'
                 if country == 'United States':
                     color = 'r'
+                    label= 'USA'
                 ax.bar(df_diversity['Year'], df_diversity[f'{country} Prop'], width=0.75, bottom=running_bottom, color=color, label=label)
             else:
                 ax.bar(df_diversity['Year'], df_diversity[f'{country} Prop'], width=0.75, bottom=running_bottom, label=label)
@@ -573,9 +573,25 @@ class DataAnalyzer:
             self._diversity_indiv()
         elif kind == 'c':
             self._diversity_continent()
-        else:
+        elif kind=='both':
             self._diversity_indiv()
             self._diversity_continent()
+
+    def plot_multi_scatter(self, position_lst, stat_x, stat_y):
+        fig, ax = plt.subplots()
+        top = 0
+        for position in position_lst:
+            x = self.df_master[self.df_master['Position']==position][stat_x].to_numpy()
+            y = self.df_master[self.df_master['Position']==position][stat_y].to_numpy()
+            top = np.max(np.maximum(x, y))
+            ax.scatter(x, y, alpha=0.4, label=position)
+        ax.set_xlabel(stat_x)
+        ax.set_ylabel(stat_y)
+        ax.set_xlim(-1, top+1)
+        ax.set_ylim(-1, 20)
+        ax.title.set_text(f'{stat_y} vs. {stat_x}')
+        ax.legend()
+        fig.show()
 
     def goal_t_test(self):
         forward_goals = self.df_master[self.df_master['Position']=='Forward']['Goals'].to_numpy()
