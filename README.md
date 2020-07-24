@@ -89,7 +89,11 @@ ___
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/assist_goal_forward_mid_10.png)
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/samps.png)
 
-    h<sub>&mu;</sub>(F) = &mu;<sub>M</sub>
+H0: mean(Forward) = mean(Midfielder)
+HA: mean(Forward) != mean(Midfielder)
 
+pvalue=3.669030790972897e-08
+
+Fail to Reject H0
 
 
