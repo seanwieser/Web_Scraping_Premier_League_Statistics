@@ -631,7 +631,7 @@ class DataAnalyzer:
             sample_means = self.sample(x)
             ax.hist(sample_means, bins = 100, label=position, alpha=0.5)
             dists.append(sample_means)
-        print(stats.ttest_ind(dists[0], dists[1])[1])
+        print(stats.ttest_ind(dists[0], dists[1]))
         ax.legend()
         ax.title.set_text('Sampling Distributions of Assists per Appearance')
         ax.set_xlabel('Assists per Appearance')
