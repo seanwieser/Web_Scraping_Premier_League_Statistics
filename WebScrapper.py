@@ -453,12 +453,20 @@ class PlayerScrapper:
         return year_df
 
     def contruct_master_df(self, start_year, stop_year, filter):
-        df_master = pd.DataFrame()
-        for year in range(start_year, stop_year+1):
-            print(f'Scraping {year}')
-            df = self.execute_year_to_pandas(year)
-            df_master = pd.concat([df_master, df])
-        print(df_master[['Name', 'Appearances', 'Year', 'Club', 'Position', 'Nationality']])
+        csv_file_path = 'data/epl/master_df.csv'
+        df_master = 0
+        if not Path(csv_file_path).is_file():
+            df_master = pd.DataFrame()
+            for year in range(start_year, stop_year+1):
+                print(f'Scraping {year}')
+                df = self.execute_year_to_pandas(year)
+                df_master = pd.concat([df_master, df])
+            df_master.to_csv(csv_file_path, index=False)
+        else:
+            df_master = pd.read_csv(csv_file_path)
+
+        if filter:
+            df_master = df_master[df_master['Appearances']!=0]
         return df_master
 
 
@@ -562,10 +570,16 @@ class DataAnalyzer:
         ax.title.set_text('Proportions of Continents Represented in EPL Between 2006 and 2018')
         fig.show()
 
-    def diversity(self):
-        pass
-        # self._diversity_indiv()
-        # self._diversity_continent()
+    def diversity(self, kind='both'):
+        if kind =='i':
+            self._diversity_indiv()
+        elif kind == 'c'
+            self._diversity_continent()
+        else:
+            self._diversity_indiv()
+            self._diversity_continent()
+
+
         
 
 
