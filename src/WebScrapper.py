@@ -629,15 +629,16 @@ class DataAnalyzer:
             x.loc[:, stat] = x.loc[:, stat].div(x['Appearances'], axis=0)
             x = x[stat]
             sample_means = self.sample(x)
-            ax.hist(sample_means, bins = 100, label=position, alpha=0.5)
+            ax.hist(sample_means, bins=25, label=position, alpha=0.5)
             dists.append(sample_means)
+        print(np.mean(dists[0]), np.mean(dists[1]))
         print(stats.ttest_ind(dists[0], dists[1]))
         ax.legend()
         ax.title.set_text('Sampling Distributions of Assists per Appearance')
         ax.set_xlabel('Assists per Appearance')
         fig.show()
 
-    def sample(self, data, samplesize=30, n_samples=100_000):
+    def sample(self, data, samplesize=30, n_samples=1000):
         means = []
         for i in range(n_samples):
             sample = np.random.choice(data, size=samplesize, replace=True)
