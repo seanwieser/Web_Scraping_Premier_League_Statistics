@@ -42,10 +42,11 @@ The pipeline occurs in the following fashion:
     1. Get Player HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
         * Saved HTMLs to "data/epl/epl_players/year/players/player"
-        * Example of Goalkeeper webpage: [Goalkeeper](https://www.premierleague.com/players/4664/Hugo-Lloris/stats?co=1&se=210)
-        * Example of Defender webpage: [Defender](https://www.premierleague.com/players/5140/Virgil-van-Dijk/stats?co=1&se=210)
-        * Example of Midfielder webpage: [Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
-        * Example of Forward webpage: [Forward](https://www.premierleague.com/players/4328/Sergio-Ag%C3%BCero/stats?co=1&se=210)
+        * Example of player webpages: 
+            * [Goalkeeper](https://www.premierleague.com/players/4664/Hugo-Lloris/stats?co=1&se=210)
+            * [Defender](https://www.premierleague.com/players/5140/Virgil-van-Dijk/stats?co=1&se=210)
+            * Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
+            * [Forward](https://www.premierleague.com/players/4328/Sergio-Ag%C3%BCero/stats?co=1&se=210)
     1. Parse Player HTMLs
         * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
