@@ -1,2 +1,5 @@
-data/*
+data/epl/epl_clubs/*
+data/epl/epl_players/*
+data/epl/epl_ignore/*
+data/epl/bin/*
 __pycache__/*

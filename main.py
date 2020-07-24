@@ -6,5 +6,5 @@ if __name__ == "__main__":
     # analyzer.plot_multi_scatter(['Forward', 'Midfielder'], 'Passes per Game', 'Assists')
 
     # analyzer.print_df()
-    analyzer.diversity(kind='both')
+    # analyzer.diversity(kind='both')
     # analyzer.goal_t_test() 
