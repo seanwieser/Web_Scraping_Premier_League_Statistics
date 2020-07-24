@@ -13,12 +13,15 @@ The pipeline occurs in the following fashion:
 This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
     1. Get HTML
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
-        * Saved HTML to 'data/epl/epl_clubs/{year}/{year}_epl_clubs.html
-        Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
+        * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
+        * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
     2. Parse Club List HTML
-        This step 
-1. Get Club HTMLs
-
+        * Used BeautifulSoup to extract club/url key/value pairs from HTML
+        * Saved this information as a dictionary in a class variable to be accessed later
+1. Club
+    1. Get Club HTMLs
+        * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
+    1.
 1. Parse Club HTMLs
 
 1. Write Player HTMLs
