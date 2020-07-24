@@ -29,8 +29,9 @@ def _update_progress(count, total, suffix=''):
 class PlayerScrapper:
     def __init__(self):
         self.year = 2000
-        self.players_url = []
-        self.list_df = None
+        self.players_url = {}
+        self.clubs_url = {}
+        self.player_list_df = None
         self.year_dict = self._make_years_dict()
         self.str_dict = {'url list': '', 'local list': '', 'local player': ''}
         self._update_str_dict()
@@ -39,7 +40,11 @@ class PlayerScrapper:
         self.str_dict['url list'] = f'https://www.premierleague.com/players?se={self.year_dict[self.year]}'
         self.str_dict['local list'] = f'data/epl/epl_players/{self.year}/{self.year}_epl_players.html'
         self.str_dict['local player'] = f'data/epl/epl_players/{self.year}/players/'
-        self.str_dict['local year'] = f'data/epl/epl_players/{self.year}'
+        self.str_dict['local player year'] = f'data/epl/epl_players/{self.year}'
+        self.str_dict['url club'] = f'https://www.premierleague.com/clubs?se={self.year_dict[self.year]}'
+        self.str_dict['local club list'] = f'data/epl/epl_clubs/{self.year}/{self.year}_epl_clubs.html'
+        self.str_dict['local club'] = f'data/epl/epl_clubs/{self.year}/clubs/'
+        self.str_dict['local club year'] = f'data/epl/epl_clubs/{self.year}'
 
     def _make_years_dict(self):
         # Initializating map specific to players website for years 2018-2000
@@ -47,7 +52,7 @@ class PlayerScrapper:
         year_codes = ['210', '79', '54', '42', '27'] + [x for x in range(22, 8, -1)]
         return dict(zip(years, year_codes))
 
-    def _write_list_html_from_url(self):
+    def _write_player_list_html_from_url(self):
         url = self.str_dict['url list']
         print(f'pulling and opening players list html from url:\n{url}')
         browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
@@ -76,19 +81,6 @@ class PlayerScrapper:
         f.write(browser.page_source)
         f.close()
         browser.close()
-    
-    '''
-    def _write_player_html_from_url(self, player_str):
-        url = self.players_url[player_str]
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0'}
-        req = urllib.request.Request(url=url, headers=headers) # self request object will integrate your URL and the headers defined above
-        page_html = ''
-        with urllib.request.urlopen(req) as response:
-            page_html = response.read()
-        f = open(''.join([self.str_dict['local player'], player_str.replace(' ', '_')]), 'wb')
-        f.write(page_html)
-        f.close()
-    '''
 
     def write_player_html(self):
         self._update_str_dict()
@@ -100,12 +92,12 @@ class PlayerScrapper:
     def get_player_html(self, player_str):
         return open(''.join([self.str_dict['local player'], player_str]))
 
-    def write_list_html(self):
+    def write_player_list_html(self):
         self._update_str_dict()
         if not Path(self.str_dict['local list']).is_file():
             self._write_list_html_from_url()
 
-    def get_list_html(self):
+    def get_player_list_html(self):
         return open(self.str_dict['local list'])
 
     def get_ascii(self, s):
@@ -114,7 +106,7 @@ class PlayerScrapper:
         else:
             return unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode('utf-8')
 
-    def parse_list_html_to_pandas(self, html):
+    def parse_player_list_html_to_pandas(self, html):
         with open(self.str_dict['local list']) as fp:
             soup = BeautifulSoup(fp, 'html.parser')
         info = [[],[],[], {}]
@@ -143,9 +135,8 @@ class PlayerScrapper:
             info[3][self.get_ascii(name)] = ''.join(['https:', self.get_ascii(player_url), str(self.year_dict[self.year])]).replace('overview', 'stats?co=1&se=')
         df_list = pd.DataFrame(np.array(info[:3])).transpose().rename(columns={0: 'Name', 1: 'Position', 2: 'Nationality'})
         self.players_url = info[3]
-        self.list_df = df_list.set_index('Name')
+        self.player_list_df = df_list.set_index('Name')
         
-
     def _get_attack_stats(self, position, li):
         goals_per, penalties, freekicks, shots, shots_on, shooting_acc, big_missed = [None]*7
         goals = int(li.find_all('span', attrs={'class':'allStatContainer statgoals'})[0].getText())
@@ -203,7 +194,6 @@ class PlayerScrapper:
                     errors_goal, \
                     last_man_tackles, clearances_off_line]
 
-    
     def _get_discipline_stats(self, position, li):
         yellows, reds, fouls, offsides = [None]*4
 
@@ -237,7 +227,6 @@ class PlayerScrapper:
 
         return [assists, passes, passes_per, big_chances, crosses, cross_accuracy, through_balls, accurate_long_balls, goalie_goals]
         
-
     def _get_goalkeeping_stats(self, li):
         saves = int(li.find_all('span', attrs={'class':'allStatContainer statsaves'})[0].getText())
         penalties_saved = int(li.find_all('span', attrs={'class':'allStatContainer statpenalty_save'})[0].getText())
@@ -248,7 +237,6 @@ class PlayerScrapper:
         throw_outs = int(li.find_all('span', attrs={'class':'allStatContainer statkeeper_throws'})[0].getText())
         goal_kicks = int(li.find_all('span', attrs={'class':'allStatContainer statgoal_kicks'})[0].getText())
         return [saves, penalties_saved, punches, high_claims, catches, sweeper_clearances, throw_outs, goal_kicks]
-
 
     def _get_stats(self, position, normalStats):
         attack, defence, teamplay, discipline, goalkeeping = [[],[],[],[],[]]
@@ -283,14 +271,6 @@ class PlayerScrapper:
                 continue
             with open(file_path) as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
-            '''
-            # Club info
-            club1 = soup.find_all('div', attrs={'class': 'wrapper hasFixedSidebar'})[0]
-            print(club1)
-            club2 = club1.find_all('dic', attrs={'class': 'label'})
-
-            raise
-            '''
             # Top banner
             name, number = filename.replace('_', ' '), None
             try: 
@@ -301,7 +281,7 @@ class PlayerScrapper:
                 number = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'number t-colour'})[0].getText()
             except:
                 pass
-            position = self.list_df.loc[name]['Position']
+            position = self.player_list_df.loc[name]['Position']
             # 'Top' stats for season
             topStats = soup.find_all('div', attrs={'class': 'topStatList'})[0].find_all('div', attrs={'class': 'topStat'})
             appearances = topStats[0].find_all('span', attrs={'class':'allStatContainer statappearances'})[0].getText()
@@ -310,7 +290,7 @@ class PlayerScrapper:
             # Normal stats which are different for different positions
             normalStats = soup.find_all('ul', attrs={'class': 'normalStatList block-list-2 block-list-2-m block-list-padding'})[0] \
                               .find_all('li')
-            player_row = [name, self.year, position, appearances, wins, losses, self.list_df.loc[name]['Nationality']]
+            player_row = [name, self.year, position, appearances, wins, losses, self.player_list_df.loc[name]['Nationality']]
             i, done = 0, False
             positions = ['Forward', 'Midfielder', 'Defender', 'Goalkeeper']
             _update_progress(j, total, f'********{filename}***************')
@@ -343,24 +323,126 @@ class PlayerScrapper:
                             45: 'Goalie Goals', 46: 'Yellows', 47: 'Reds', 48: 'Fouls', 49: 'Offsides',\
                             50: 'Saves', 51: 'Penalties Saved', 52: 'Punches', 53: 'High claims', 54: 'Catches',\
                             55: 'Sweeper Clearances', 56: 'Throw Outs', 57: 'Goal Kicks'})
-        csv_file_path = ''.join([self.str_dict['local year'], f'/{self.year}_df.csv'])
+        csv_file_path = ''.join([self.str_dict['local player year'], f'/{self.year}_df.csv'])
         if Path(csv_file_path).is_file():
             f = open(csv_file_path, "w+").close()
         df.to_csv(csv_file_path)
 
-    def get_df(self, overwrite=False):
-        csv_file_path = ''.join([self.str_dict['local year'], f'/{self.year}_df.csv'])
-
+    def get_player_df(self, overwrite=False):
+        csv_file_path = ''.join([self.str_dict['local player year'], f'/{self.year}_df.csv'])
         if not Path(csv_file_path).is_file() or overwrite:
             self.parse_player_htmls()
         return pd.read_csv(csv_file_path)
     
+    def get_club_list_html(self):
+        self._update_str_dict()
+        return open(self.str_dict['local club list'])
+
+    def parse_club_list_html(self, html):
+        with open(self.str_dict['local club list']) as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
+        
+        clubs = []
+        club_boxes = soup.find_all('div', attrs={'class': 'indexSection'})[0].find_all('li')
+        club_year_dict = {}
+        for club in club_boxes:
+            club_url = ''.join(['https:', club.find('a')['href'].replace('overview', 'squad')])
+            club_name = club.find_all('h4', attrs={'class': 'clubName'})[0].getText()
+            club_year_dict[club_name] = club_url
+        self.clubs_url = club_year_dict
+
+    def _write_club_list_html_from_url(self):
+        self._update_str_dict()
+        url = self.str_dict['url club']
+        print(f'pulling and opening club list html for:\n\t\t{url}')
+        browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
+        browser.get(url)
+        browser.maximize_window()
+        time.sleep(3)
+        f = open(self.str_dict['local club list'], 'w')
+        f.write(browser.page_source)
+        f.close()
+        browser.close()
+
+    def write_club_list_html(self):
+        self._update_str_dict()
+        if not Path(self.str_dict['local club list']).is_file():
+            self._write_club_list_html_from_url()
+
+    def _write_club_html_from_url(self, club_str):
+        self._update_str_dict()
+        url = ''.join([self.clubs_url[club_str], f'?se={self.year_dict[self.year]}'])
+        print(f'pulling and opening {club_str} html at:\n\t\t{url}')
+        browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
+        browser.get(url)
+        browser.maximize_window()
+        time.sleep(3)
+        f = open(''.join([self.str_dict['local club'], club_str.replace(' ', '_')]), 'w')
+        f.write(browser.page_source)
+        f.close()
+        browser.close()
+
+    def write_club_html(self):
+        self._update_str_dict()
+        for club_str in self.clubs_url.keys():
+            test = Path(''.join([self.str_dict['local club'], club_str.replace(' ', '_')])).is_file()
+            if not test and club_str not in 'data/epl/ignore/ignored.html':
+                self._write_club_html_from_url(club_str)
+
+    def parse_club_htmls(self):
+        j = -1
+        total = len(os.listdir(self.str_dict['local club']))
+        club_array = [[]]
+        for filename in os.listdir(self.str_dict['local club']):
+
+            j += 1
+            file_path = Path(''.join([self.str_dict['local club'], filename]))
+            if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
+                print(f'\nIGNORED {filename}\n')
+                continue
+            with open(file_path) as fp:
+                soup = BeautifulSoup(fp, 'html.parser')
+            player_blocks = soup.find_all('div', attrs={'class': 'wrapper col-12'})[0]\
+                                .find_all('header', attrs={'class': 'squadPlayerHeader'})
+            club_players = []
+            for player in player_blocks:
+                player_name = player.find_all('span', attrs={'class': 'playerCardInfo'})[0]\
+                                .find_all('h4', attrs={'class': 'name'})[0].getText()
+                if player_name not in club_players:
+                    club_players.append(player_name)
+                    club_array.append([player_name, filename.replace('_', ' '), self.year])            
+            _update_progress(j, total, f'********{filename}***************************')
+
+        club_array.pop(0)
+        club_df = pd.DataFrame(np.array(club_array).reshape(-1, 3)).rename(columns={0: 'Name', 1: 'Club', 2: 'Year'})
+        csv_file_path = ''.join([self.str_dict['local club year'], f'/{self.year}_df.csv'])
+        if Path(csv_file_path).is_file():
+            f = open(csv_file_path, "w+").close()
+        club_df.to_csv(csv_file_path)
+
+    def get_club_df(self, overwrite=False):
+        csv_file_path = ''.join([self.str_dict['local club year'], f'/{self.year}_df.csv'])
+        if not Path(csv_file_path).is_file() or overwrite:
+            self.parse_club_htmls()
+        return pd.read_csv(csv_file_path)
+
+    def _execute_player_year_to_pandas(self):
+        self.write_player_list_html()
+        self.parse_player_list_html_to_pandas(self.get_player_list_html())
+        self.write_player_html()
+        return self.get_player_df()
+
+    def _execute_club_year_to_pandas(self):
+        self.write_club_list_html()
+        self.parse_club_list_html(self.get_club_list_html())
+        self.write_club_html()
+        return self.get_club_df()
+
     def execute_year_to_pandas(self, year):
         self.year = year
-        self.write_list_html()
-        self.parse_list_html_to_pandas(self.get_list_html())
-        self.write_player_html()
-        return self.get_df()
+        player_df = self._execute_player_year_to_pandas()
+        club_df = self._execute_club_year_to_pandas()
+        
 
     def collect_all_names(self, dfs):
         names = []
@@ -369,13 +451,11 @@ class PlayerScrapper:
                 names.append(name)
         return names
 
-    def contruct_master_df(self, start_year, stop_year, filter=False):
+    def contruct_master_df(self, start_year, stop_year, filter):
         df_master = pd.DataFrame()
         for year in range(start_year, stop_year+1):
             print(f'Scraping {year}')
             df = self.execute_year_to_pandas(year)
-            if filter:
-                df = df[df['Appearances']!=0]
             df_master = pd.concat([df_master, df])
 
         return df_master
@@ -442,7 +522,6 @@ class DataAnalyzer:
                 return map_idx[idx]
         return map_idx[5]
 
-
     def _diversity_continent(self):
         continent_values = self.df_master.groupby(by=['Nationality', 'Year']).count()['Name'].reset_index()\
                             .rename(columns={'Name': 'Count'}).sort_values(by='Nationality').reset_index()[['Nationality', 'Year', 'Count']]
@@ -483,10 +562,20 @@ class DataAnalyzer:
         fig.show()
 
     def diversity(self):
-        self._diversity_indiv()
-        self._diversity_continent()
+        pass
+        # self._diversity_indiv()
+        # self._diversity_continent()
         
-        
+
+
+
+
+
+
+
+
+
+
 '''   
 
 class TransferScrapper:
