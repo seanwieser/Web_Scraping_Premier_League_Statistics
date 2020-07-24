@@ -81,4 +81,9 @@ The pipeline occurs in the following fashion:
         * 'Goalie Goals', 'Saves', 'Penalties Saved', 'Punches', 'High claims', 'Catches', 'Sweeper Clearances', 'Throw Outs', 'Goal Kicks'
 ___
 
+## **Data Visualization and Analyses**
+
+### Diversity of Nationality in EPL
+
+
 
