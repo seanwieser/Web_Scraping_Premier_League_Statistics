@@ -32,16 +32,9 @@ class PlayerScrapper:
         self.players_url = {}
         self.clubs_url = {}
         self.player_list_df = None
-        self.player_df = None
         self.year_dict = self._make_years_dict()
-        self.str_dict = {}
+        self.str_dict = {'url list': '', 'local list': '', 'local player': ''}
         self._update_str_dict()
-
-    def reset_init(self):
-        self.players_url = {}
-        self.clubs_url = {}
-        self.player_list_df = None
-        self.player_df = None
 
     def _update_str_dict(self):
         self.str_dict['url list'] = f'https://www.premierleague.com/players?se={self.year_dict[self.year]}'
@@ -59,8 +52,25 @@ class PlayerScrapper:
         year_codes = ['210', '79', '54', '42', '27'] + [x for x in range(22, 8, -1)]
         return dict(zip(years, year_codes))
 
+    def _write_player_list_html_from_url(self):
+        url = self.str_dict['url list']
+        print(f'pulling and opening players list html from url:\n{url}')
+        browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
+        browser.get(url)
+        time.sleep(5)
+        elem = browser.find_element_by_tag_name("body")
+        no_of_pagedowns = 80
+        for cur_num in range(no_of_pagedowns, 0, -1):
+            if not cur_num%20:
+                print(f'Page Down: {cur_num}')
+            elem.send_keys(Keys.PAGE_DOWN)
+            time.sleep(1)
+        f = open(self.str_dict['local list'], 'w')
+        f.write(browser.page_source)
+        f.close()
+        browser.close()
+
     def _write_player_html_from_url(self, player_str):
-        player_str = self.get_ascii(player_str)
         url = self.players_url[player_str]
         print(f'pulling and opening player stats html for:\n{player_str}\t\t{url}')
         browser = webdriver.Chrome(executable_path='/home/seanwieser/sel_drivers/chromedriver')
@@ -75,22 +85,58 @@ class PlayerScrapper:
     def write_player_html(self):
         self._update_str_dict()
         for player_str in self.players_url.keys():
-            player_str = self.get_ascii(player_str)
             test = Path(''.join([self.str_dict['local player'], player_str.replace(' ', '_')])).is_file()
             if not test and player_str not in 'data/epl/ignore/ignored.html':
-                print(test)
-                print(''.join([self.str_dict['local player'], player_str.replace(' ', '_')]))
                 self._write_player_html_from_url(player_str)
 
     def get_player_html(self, player_str):
         return open(''.join([self.str_dict['local player'], player_str]))
+
+    def write_player_list_html(self):
+        self._update_str_dict()
+        if not Path(self.str_dict['local list']).is_file():
+            self._write_list_html_from_url()
+
+    def get_player_list_html(self):
+        return open(self.str_dict['local list'])
 
     def get_ascii(self, s):
         if all(ord(c) < 128 for c in s):
             return s
         else:
             return unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode('utf-8')
-  
+
+    def parse_player_list_html_to_pandas(self, html):
+        with open(self.str_dict['local list']) as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
+        info = [[],[],[], {}]
+        rows = soup.findAll('tr')
+        for idx in range(1, len(rows)):
+            contents = rows[idx].findAll('td')
+            if len(contents[0])<1 or len(contents[1])<1 or len(contents[2])<1:
+                # print(f'Ignoring {idx} in year {self.year}')
+                f = open('data/epl/ignore/ignored.html', 'w')
+                f.write(str(contents))
+                f.close()
+                continue
+            name = contents[0].findAll(text=True)[0].replace('.', '')
+            position = contents[1].findAll(text=True)[0]
+            nation = contents[2].findAll(text=True)
+            player_url = ''.join([rows[idx].find('a')['href'][:38], rows[idx].find('a')['href'][38:].replace('.', '')])
+            while ' ' in nation:
+                nation.remove(' ')
+            if len(nation)==0:
+                nation = ''
+            elif len(nation)==1:
+                nation = nation[0]
+            info[0].append(name.replace('.', ''))
+            info[1].append(position)
+            info[2].append(nation)
+            info[3][self.get_ascii(name)] = ''.join(['https:', self.get_ascii(player_url), str(self.year_dict[self.year])]).replace('overview', 'stats?co=1&se=')
+        df_list = pd.DataFrame(np.array(info[:3])).transpose().rename(columns={0: 'Name', 1: 'Position', 2: 'Nationality'})
+        self.players_url = info[3]
+        self.player_list_df = df_list.set_index('Name')
+        
     def _get_attack_stats(self, position, li):
         goals_per, penalties, freekicks, shots, shots_on, shooting_acc, big_missed = [None]*7
         goals = int(li.find_all('span', attrs={'class':'allStatContainer statgoals'})[0].getText())
@@ -217,13 +263,7 @@ class PlayerScrapper:
         player_array = [[]]
         j = -1
         total = len(os.listdir(self.str_dict['local player']))
-        local_player_year_str = self.str_dict['local player year']
-        player_list_df = self.player_list_df.set_index('Name')
-        files_to_delete = []
         for filename in os.listdir(self.str_dict['local player']):
-            if filename.replace('_', ' ') not in self.players_url:
-                files_to_delete.append(filename)
-                continue
             j += 1
             file_path = Path(''.join([self.str_dict['local player'], filename]))
             if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
@@ -241,8 +281,7 @@ class PlayerScrapper:
                 number = soup.find_all('div', class_='playerDetails')[0].find_all('div', attrs={'class': 'number t-colour'})[0].getText()
             except:
                 pass
-            name = self.get_ascii(name)
-            position = player_list_df.loc[name]['Position']
+            position = self.player_list_df.loc[name]['Position']
             # 'Top' stats for season
             topStats = soup.find_all('div', attrs={'class': 'topStatList'})[0].find_all('div', attrs={'class': 'topStat'})
             appearances = topStats[0].find_all('span', attrs={'class':'allStatContainer statappearances'})[0].getText()
@@ -251,7 +290,7 @@ class PlayerScrapper:
             # Normal stats which are different for different positions
             normalStats = soup.find_all('ul', attrs={'class': 'normalStatList block-list-2 block-list-2-m block-list-padding'})[0] \
                               .find_all('li')
-            player_row = [name, self.year, position, appearances, wins, losses, player_list_df.loc[name]['Nationality']]
+            player_row = [name, self.year, position, appearances, wins, losses, self.player_list_df.loc[name]['Nationality']]
             i, done = 0, False
             positions = ['Forward', 'Midfielder', 'Defender', 'Goalkeeper']
             _update_progress(j, total, f'********{filename}***************')
@@ -268,11 +307,7 @@ class PlayerScrapper:
                     f.write(f'{filename}\n')
                     f.close()
             player_array.append(player_row)
-
-        with open(f'data/epl/epl_players/{self.year}/{self.year}_files_to_delete.txt', 'w') as f:
-            for filename in files_to_delete: 
-                f.write(f'{filename}\n')
-
+            
         player_array.pop(0)
         df = pd.DataFrame(np.array(player_array))\
             .rename(columns={0: 'Name', 1: 'Year', 2: 'Position', 3: 'Appearances', 4: 'Wins', 5: 'Losses', 6: 'Nationality',\
@@ -356,10 +391,10 @@ class PlayerScrapper:
 
     def parse_club_htmls(self):
         j = -1
-        total = len(os.listdir(self.str_dict['local club']))-1
+        total = len(os.listdir(self.str_dict['local club']))
         club_array = [[]]
-        htmls_to_add = []
         for filename in os.listdir(self.str_dict['local club']):
+
             j += 1
             file_path = Path(''.join([self.str_dict['local club'], filename]))
             if Path(''.join(['data/epl/ignore/', filename, '_', str(self.year)])).is_file():
@@ -368,28 +403,18 @@ class PlayerScrapper:
             with open(file_path) as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
             player_blocks = soup.find_all('div', attrs={'class': 'wrapper col-12'})[0]\
-                                .find_all('a', attrs={'class': ['playerOverviewCard active', 'playerOverviewCard inactive']})
+                                .find_all('header', attrs={'class': 'squadPlayerHeader'})
             club_players = []
             for player in player_blocks:
-                player_name = self.get_ascii(player.find_all('span', attrs={'class': 'playerCardInfo'})[0]\
-                                .find_all('h4', attrs={'class': 'name'})[0].getText())
+                player_name = player.find_all('span', attrs={'class': 'playerCardInfo'})[0]\
+                                .find_all('h4', attrs={'class': 'name'})[0].getText()
                 if player_name not in club_players:
                     club_players.append(player_name)
-                    player_position = player.find_all('span', attrs={'class': 'playerCardInfo'})[0]\
-                                        .find_all('span', attrs={'class': 'position'})[0].getText()
-                    player_nation = player.find_all('dd', attrs={'class': 'info'})[0]\
-                                        .find_all('span', attrs={'class': 'playerCountry'})[0].getText()
+                    club_array.append([player_name, filename.replace('_', ' '), self.year])            
+            _update_progress(j, total, f'********{filename}***************************')
 
-                    player_row = [player_name, filename.replace('_', ' '), self.year, player_position, player_nation]
-                    club_array.append(player_row)  
-                    player_url = ''.join(['https://', player['href'].strip('//'), f'?co=1&se={self.year_dict[self.year]}'])\
-                                    .replace('overview', 'stats')
-                    if player_name not in self.players_url:
-                        self.players_url[player_name] = player_url               
-            # _update_progress(j, total, f'********{filename}***************************')
         club_array.pop(0)
-        club_df = pd.DataFrame(np.array(club_array).reshape(-1, 5)).rename(columns={\
-            0: 'Name', 1: 'Club', 2: 'Year', 3: 'Position', 4: 'Nationality'})
+        club_df = pd.DataFrame(np.array(club_array).reshape(-1, 3)).rename(columns={0: 'Name', 1: 'Club', 2: 'Year'})
         csv_file_path = ''.join([self.str_dict['local club year'], f'/{self.year}_df.csv'])
         if Path(csv_file_path).is_file():
             f = open(csv_file_path, "w+").close()
@@ -402,55 +427,29 @@ class PlayerScrapper:
         return pd.read_csv(csv_file_path)
 
     def _execute_player_year_to_pandas(self):
-
+        self.write_player_list_html()
+        self.parse_player_list_html_to_pandas(self.get_player_list_html())
         self.write_player_html()
-        player_df = self.get_player_df()
-        player_df['Position'] = player_df['Position'].apply(self.clean_position_col)
-        player_df['Nationality'] = player_df['Nationality'].apply(self.clean_nation_col)
-
-        player_df.drop(labels='Unnamed: 0', axis=1, inplace=True)
-        return player_df
+        return self.get_player_df()
 
     def _execute_club_year_to_pandas(self):
         self.write_club_list_html()
         self.parse_club_list_html(self.get_club_list_html())
         self.write_club_html()
-        club_df = self.get_club_df()
-        club_df['Position'] = club_df['Position'].apply(self.clean_position_col)
-        club_df['Nationality'] = club_df['Nationality'].apply(self.clean_nation_col)
-        return club_df
-
-    def clean_position_col(self, col):
-        positions = ['Forward', 'Midfielder', 'Defender', 'Goalkeeper']
-        for position in positions:
-            if position in col:
-                return position
-        return 'Unknown' 
-
-    def clean_nation_col(self, col):
-        eu_countries = pd.read_csv('data/bin/listofeucountries.csv')
-        latin_countries = pd.read_csv('data/bin/list-latin-american-countries.csv')
-        north_countries = pd.read_csv('data/bin/list-north-american-countries.csv')
-        african_countries = pd.read_csv('data/bin/list-african-countries.csv')
-        asian_countries = pd.read_csv('data/bin/list-countries-asia.csv')
-        continent_dfs = [eu_countries, latin_countries, north_countries, african_countries, asian_countries]
-
-        for continent in continent_dfs:
-            for country in continent['x'].to_list():
-                try:
-                    if country in col:
-                        return country
-                except:
-                    return 'Unknown'
-        return 'Unknown'
+        return self.get_club_df()
 
     def execute_year_to_pandas(self, year):
-        self.year = year 
-        self.player_list_df = self._execute_club_year_to_pandas()[['Name', 'Year', 'Club', 'Position', 'Nationality']]
+        self.year = year
         player_df = self._execute_player_year_to_pandas()
-        year_df = player_df.merge(self.player_list_df, how='outer', on=['Name', 'Year', 'Position', 'Nationality']).sort_values(by='Name')
-        self.reset_init()
-        return year_df
+        club_df = self._execute_club_year_to_pandas()
+        
+
+    def collect_all_names(self, dfs):
+        names = []
+        for df in dfs.values():
+            for name in df['Name']:
+                names.append(name)
+        return names
 
     def contruct_master_df(self, start_year, stop_year, filter):
         df_master = pd.DataFrame()
@@ -458,7 +457,7 @@ class PlayerScrapper:
             print(f'Scraping {year}')
             df = self.execute_year_to_pandas(year)
             df_master = pd.concat([df_master, df])
-        print(df_master[['Name', 'Appearances', 'Year', 'Club', 'Position', 'Nationality']])
+
         return df_master
 
 
