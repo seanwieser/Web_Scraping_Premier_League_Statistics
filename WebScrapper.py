@@ -643,20 +643,3 @@ class DataAnalyzer:
             sample = np.random.choice(data, size=samplesize, replace=True)
             means.append(np.mean(sample))
         return means
-        
-            
-
-    def goal_t_test(self):
-        forward_goals = self.df_master[self.df_master['Position']=='Forward']['Goals'].to_numpy()
-        midfield_goals = self.df_master[self.df_master['Position']=='Midfielder']['Goals'].to_numpy()
-        forward_means = []
-        midfield_means = []
-        for i in range(100000):
-            forward_sample = np.random.choice(forward_goals, 50)
-            midfield_sample = np.random.choice(midfield_goals, 50)
-            forward_means.append(np.mean(forward_sample))
-            midfield_means.append(np.mean(midfield_sample))
-        fig, axes = plt.subplots(2,1)
-        axes[0].hist(forward_means, bins=30, density=True)
-        axes[1].hist(midfield_means, bins=30, density=True)
-        fig.show()
