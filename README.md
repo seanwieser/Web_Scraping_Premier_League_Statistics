@@ -9,15 +9,15 @@ Various visualizations and analyses of English Premier League players from 2000-
 ## **Data Source**
 I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
 The pipeline occurs in the following fashion:
-### **Club List**
-This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
-    1. Get HTML
-        * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
-        * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
-        * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
-    2. Parse Club List HTML
-        * Used BeautifulSoup to extract club/url key/value pairs from HTML
-        * Saved this information as a dictionary in a class variable to be accessed later
+### 1. **Club List**
+   * This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
+        1. Get HTML
+            * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
+            * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
+            * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
+        2. Parse Club List HTML
+            * Used BeautifulSoup to extract club/url key/value pairs from HTML
+            * Saved this information as a dictionary in a class variable to be accessed later
 ### 1. Club
     1. Get Club HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
