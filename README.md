@@ -11,7 +11,7 @@ ___
 I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
 
 The pipeline occurs in the following fashion:
-### 1. **Club List**
+### 1. Club List
 * This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
 
     1. Get Club List HTML
@@ -22,7 +22,7 @@ The pipeline occurs in the following fashion:
         * Used BeautifulSoup to extract club/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
             
-### 1. **Club**
+### 1. Club
 * This step provided a player list and URLS for each of the twenty clubs competing in the EPL for that particular year
 * Created a Pandas Dataframe with Name, Year, Position, and Nationality and wrote it to a CSV file
     
@@ -36,7 +36,7 @@ The pipeline occurs in the following fashion:
         * Constructed Pandas Dataframe with information below and wrote it to a CSV file
             * Name, Year, Club, Position, Nationality
             
-### 1. **Player**
+### 1. Player
 * This step provided statistics about an individual player for a particular year
 * Created a Pandas Dataframe with 58 columns and wrote it to a CSV file
     
@@ -52,13 +52,13 @@ The pipeline occurs in the following fashion:
         * Used BeautifulSoup to extract all appropriate statistics from local HTML file
         * Put this information into a Pandas Dataframe then wrote the dataframe to a CSV file
 
-### 1. **Merge Dataframes**
+### 1. Merge Dataframes
 * For a particular year, I now had two Pandas Dataframes that needed to be merged. 
     1. Club level dataframe with 4 columns
     2. Player level dataframe with 58 columns
         * Merged on Name, Year, Position, Nationality
 
-### 1. **Iterate Pipeline over Year Range**
+### 1. Iterate Pipeline over Year Range
 * Iterate Steps 1-4 from 2006 to 2018 concatenating each resulting dataframe
     * This is the annual range that had consistent statistics fields for players
 
