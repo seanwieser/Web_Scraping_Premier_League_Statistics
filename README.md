@@ -60,8 +60,22 @@ The pipeline occurs in the following fashion:
 ### 1. **Iterate Pipeline over Year Range**
 * Iterate Steps 1-4 from 2006 to 2018 concatenating each resulting dataframe
     * This is the annual range that had consistent statistics fields for players
-* Resulting dataframe: 7473 rows x 59 columns
-    * Using only a subset of the dataframe where player made an appearance: 4750 rows x 50 columns
 
-## Data Description
+## **Data Description**
+* Resulting dataframe: 7473 rows x 59 columns
+    * Using only a subset of the dataframe where player made an appearance: 4750 rows x 59 columns
+    
+* Columns:
+    1.  Global:
+        * 'Name', 'Year', 'Club', 'Position', 'Appearances', 'Wins', 'Losses', 'Nationality'
+    1. Attack
+        * 'Goals', 'Headed Goals', 'Right Footed Goals', 'Left Footed Goals', 'Hit Woodwork', 'Goals per Match', 'Penalties Scored', 'Freekicks Scored', 'Shots', 'Shots on Target', 'Shooting Accuracy', 'Big Chances Missed'
+    1. Defence
+        * 'Tackles', 'Blocked Shots', 'Interceptions', 'Clearances', 'Headed Clearances', 'Tackle Success', 'Recoveries', 'Duels Won', 'Duels Lost', 'Successful 50/50s', 'Aerials Battles Won', 'Aerial Battles Lost', 'Clean Sheets', 'Goals Conceded', 'Own Goals', 'Errors Lead to a Goal', 'Last Man Tackles', 'Clearances Off the Line'
+    1. Team Play
+        * 'Assists', 'Passes', 'Passes per Game', 'Big Chances', 'Crosses', 'Cross Accuracy', 'Through Balls', 'Accurate Long Balls'
+    1. Discipline
+        * 'Yellows', 'Reds', 'Fouls', 'Offsides'
+    1. Goalkeeping
+        * 'Goalie Goals', 'Saves', 'Penalties Saved', 'Punches', 'High claims', 'Catches', 'Sweeper Clearances', 'Throw Outs', 'Goal Kicks', 
 
