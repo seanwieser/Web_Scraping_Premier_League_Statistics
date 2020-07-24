@@ -1,15 +1,15 @@
-# capstone_1
+# **Capstone 1**
 Analysis of Footballers
 
 Capstone 1 Project for Galvanize Data Science Immersive
 
-## Topics:
+## **Topics**:
 Various visualizations and analyses of English Premier League players from 2000-2018
 
-## Data Source
+## **Data Source**
 I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
 The pipeline occurs in the following fashion:
-1. Club List
+### **Club List**
 This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
     1. Get HTML
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
@@ -18,7 +18,7 @@ This step provided the list of names and URLs to all the clubs competing in the 
     2. Parse Club List HTML
         * Used BeautifulSoup to extract club/url key/value pairs from HTML
         * Saved this information as a dictionary in a class variable to be accessed later
-1. Club
+### 1. Club
     1. Get Club HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
     1.
