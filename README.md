@@ -89,7 +89,7 @@ ___
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/assist_goal_forward_mid_10.png)
 ![alt text](https://github.com/seanwieser/capstone_1/blob/master/images/samps.png)
 
-H_0: \mu
+    h<sub>&mu;</sub>(F) = &mu;<sub>M</sub>
 
 
 
