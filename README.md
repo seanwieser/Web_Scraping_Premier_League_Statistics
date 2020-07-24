@@ -22,7 +22,7 @@ The pipeline occurs in the following fashion:
         * Used BeautifulSoup to extract club/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
             
-### 1. Club
+### 2. Club
 * This step provided a player list and URLS for each of the twenty clubs competing in the EPL for that particular year
 * Created a Pandas Dataframe with Name, Year, Position, and Nationality and wrote it to a CSV file
     
@@ -30,13 +30,13 @@ The pipeline occurs in the following fashion:
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
         * Saved HTMLs to "data/epl/epl_clubs/year/clubs/club"
         * Example of webpage: [Club](https://www.premierleague.com/clubs/10/Liverpool/squad?se=210)
-    1. Parse Club HTMLs
+    2. Parse Club HTMLs
         * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
         * Constructed Pandas Dataframe with information below and wrote it to a CSV file
             * Name, Year, Club, Position, Nationality
             
-### 1. Player
+### 3. Player
 * This step provided statistics about an individual player for a particular year
 * Created a Pandas Dataframe with 58 columns and wrote it to a CSV file
     
@@ -48,17 +48,17 @@ The pipeline occurs in the following fashion:
             * [Defender](https://www.premierleague.com/players/5140/Virgil-van-Dijk/stats?co=1&se=210)
             * [Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
             * [Forward](https://www.premierleague.com/players/4328/Sergio-Ag%C3%BCero/stats?co=1&se=210)
-    1. Parse Player HTMLs
+    2. Parse Player HTMLs
         * Used BeautifulSoup to extract all appropriate statistics from local HTML file
         * Put this information into a Pandas Dataframe then wrote the dataframe to a CSV file
 
-### 1. Merge Dataframes
+### 4. Merge Dataframes
 * For a particular year, I now had two Pandas Dataframes that needed to be merged. 
     1. Club level dataframe with 4 columns
     2. Player level dataframe with 58 columns
         * Merged on Name, Year, Position, Nationality
 
-### 1. Iterate Pipeline over Year Range
+### 5. Iterate Pipeline over Year Range
 * Iterate Steps 1-4 from 2006 to 2018 concatenating each resulting dataframe
     * This is the annual range that had consistent statistics fields for players
 
@@ -69,15 +69,15 @@ The pipeline occurs in the following fashion:
 * Columns:
     1.  Global:
         * 'Name', 'Year', 'Club', 'Position', 'Appearances', 'Wins', 'Losses', 'Nationality'
-    1. Attack
+    2. Attack
         * 'Goals', 'Headed Goals', 'Right Footed Goals', 'Left Footed Goals', 'Hit Woodwork', 'Goals per Match', 'Penalties Scored', 'Freekicks Scored', 'Shots', 'Shots on Target', 'Shooting Accuracy', 'Big Chances Missed'
-    1. Defence
+    3. Defence
         * 'Tackles', 'Blocked Shots', 'Interceptions', 'Clearances', 'Headed Clearances', 'Tackle Success', 'Recoveries', 'Duels Won', 'Duels Lost', 'Successful 50/50s', 'Aerials Battles Won', 'Aerial Battles Lost', 'Clean Sheets', 'Goals Conceded', 'Own Goals', 'Errors Lead to a Goal', 'Last Man Tackles', 'Clearances Off the Line'
-    1. Team Play
+    4. Team Play
         * 'Assists', 'Passes', 'Passes per Game', 'Big Chances', 'Crosses', 'Cross Accuracy', 'Through Balls', 'Accurate Long Balls'
-    1. Discipline
+    5. Discipline
         * 'Yellows', 'Reds', 'Fouls', 'Offsides'
-    1. Goalkeeping
+    6. Goalkeeping
         * 'Goalie Goals', 'Saves', 'Penalties Saved', 'Punches', 'High claims', 'Catches', 'Sweeper Clearances', 'Throw Outs', 'Goal Kicks'
 ___
 
