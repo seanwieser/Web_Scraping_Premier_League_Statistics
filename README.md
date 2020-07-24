@@ -7,11 +7,16 @@ Capstone 1 Project for Galvanize Data Science Immersive
 Various visualizations and analyses of English Premier League players from 2000-2018
 
 ## Data Source
-I created the data set I used entirely by webscrapping. The pipeline occurs in the following fashion:
-1. Get Club List HTML
-
-1. Parse Club List HTML
-
+I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
+The pipeline occurs in the following fashion:
+1. Club List
+This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
+    1. Get HTML
+        * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
+        * Saved HTML to 'data/epl/epl_clubs/{year}/{year}_epl_clubs.html
+        Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
+    2. Parse Club List HTML
+        This step 
 1. Get Club HTMLs
 
 1. Parse Club HTMLs
@@ -22,7 +27,7 @@ I created the data set I used entirely by webscrapping. The pipeline occurs in t
 
 1. Merge Dataframes
 
-
+1. Iterate Pipeline over Year Range
 ## Data Description
 1. Transfers: 20 teams over 19 years with 10+ transfers per team per year \n
 1. Players: ~400 players per year over 19 years with 20+ metrics per player \n
