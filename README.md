@@ -12,7 +12,8 @@ I created the data set I used entirely by webscrapping. I encapsulated all metho
 The pipeline occurs in the following fashion:
 ### 1. **Club List**
 * This step provided the list of names and URLs to all the clubs competing in the EPL for that particular year
-    1. Get HTML
+
+    1. Get Club List HTML
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL. 
         * Saved HTML to "data/epl/epl_clubs/year/year_epl_clubs.html"
         * Example of webpage: [Club List](https://www.premierleague.com/clubs?se=210)
@@ -21,15 +22,18 @@ The pipeline occurs in the following fashion:
         * Saved this information as a dictionary in a class variable to be accessed later
             
 ### 1. **Club**
-* This step provided a player list for a club with Name, Position, and Nationality along with URLs to player page
+* This step provided a player list and URLS for a club competing in the EPL for that particular year
+* Created a Pandas Dataframe with Name, Year, Position, and Nationality and wrote it to a CSV file
     
     1. Get Club HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
         * Saved HTML to "data/epl/epl_clubs/year/clubs/club
-        Example of webpage: [Club](https://www.premierleague.com/clubs/10/Liverpool/squad?se=210)
-    1. Parse Club List HTML
-        * Used BeautifulSoup 
-1. Parse Club HTMLs
+        * Example of webpage: [Club](https://www.premierleague.com/clubs/10/Liverpool/squad?se=210)
+    1. Parse Club HTMLs
+        * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
+        * Saved this information as a dictionary in a class variable to be accessed later
+        * Constructed Pandas Dataframe with information available on this page about a particular player
+            * Name, Year, Position, Nationality
 
 1. Write Player HTMLs
 
