@@ -6,7 +6,7 @@ Capstone 1 Project for Galvanize Data Science Immersive
 ## **Topics**:
 Various visualizations and analyses of English Premier League players from 2000-2018
 
-## **Data Source**
+## **Data Collection and Organization**
 I created the data set I used entirely by webscrapping. I encapsulated all methods and properties in the PlayerScrapper class.
 
 The pipeline occurs in the following fashion:
@@ -32,12 +32,12 @@ The pipeline occurs in the following fashion:
     1. Parse Club HTMLs
         * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
         * Saved this information as a dictionary in a class variable to be accessed later
-        * Constructed Pandas Dataframe with information available on this page about a particular player
-            * Name, Year, Position, Nationality
+        * Constructed Pandas Dataframe with information below and wrote it to a CSV file
+            * Name, Year, Club, Position, Nationality
             
 ### 1. **Player**
 * This step provided statistics about an individual player for a particular year
-* Created a Pandas Dataframe with 55 columns and wrote it to a CSV file
+* Created a Pandas Dataframe with 58 columns and wrote it to a CSV file
     
     1. Get Player HTMLs
         * Used Selenium with Chromedriver because the dropdown bar would not update with specific URL.
@@ -45,19 +45,23 @@ The pipeline occurs in the following fashion:
         * Example of player webpages: 
             * [Goalkeeper](https://www.premierleague.com/players/4664/Hugo-Lloris/stats?co=1&se=210)
             * [Defender](https://www.premierleague.com/players/5140/Virgil-van-Dijk/stats?co=1&se=210)
-            * Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
+            * [Midfielder](https://www.premierleague.com/players/3920/Paul-Pogba/stats?co=1&se=210)
             * [Forward](https://www.premierleague.com/players/4328/Sergio-Ag%C3%BCero/stats?co=1&se=210)
     1. Parse Player HTMLs
-        * Used BeautifulSoup to extract player/url key/value pairs from local HTML file
-        * Saved this information as a dictionary in a class variable to be accessed later
-        * Constructed Pandas Dataframe with information available on this page about a particular player
-            * Name, Year, Position, Nationality
+        * Used BeautifulSoup to extract all appropriate statistics from local HTML file
+        * Put this information into a Pandas Dataframe then wrote the dataframe to a CSV file
 
+### 1. **Merge Dataframes**
+* For a particular year, I now had two Pandas Dataframes that needed to be merged. 
+    1. Club level dataframe with 4 columns
+    2. Player level dataframe with 58 columns
+        * Merged on Name, Year, Position, Nationality
 
-1. Merge Dataframes
+### 1. **Iterate Pipeline over Year Range**
+* Iterate Steps 1-4 from 2006 to 2018 concatenating each resulting dataframe
+    * This is the annual range that had consistent statistics fields for players
+* Resulting dataframe: 7473 rows x 59 columns
+    * Using only a subset of the dataframe where player made an appearance: 4750 rows x 50 columns
 
-1. Iterate Pipeline over Year Range
 ## Data Description
-1. Transfers: 20 teams over 19 years with 10+ transfers per team per year \n
-1. Players: ~400 players per year over 19 years with 20+ metrics per player \n
-1. Fixture results: All fixutre results over 19 years with matchday, date, home team, score, away team, notes
+
