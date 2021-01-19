@@ -1,10 +1,7 @@
-# **Capstone 1**
-Analysis of Footballers
+# **Webscraping Premier League Statistics**
 
-Capstone 1 Project for Galvanize Data Science Immersive
-
-## **Topics**:
-Various visualizations and analyses of English Premier League players from 2000-2018
+## **Goal**:
+Webscrape English Premier League player statistics from 2000-2018
 ___
 ## **Data Collection and Organization**
 
