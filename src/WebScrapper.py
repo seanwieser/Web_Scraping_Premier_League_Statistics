@@ -403,7 +403,7 @@ class PlayerScrapper:
         self.write_player_html()
         player_df = self.get_player_df()
         player_df['Position'] = player_df['Position'].apply(self.clean_position_col)
-        player_df['Nationality'] = player_df['Nationality'].apply(self.clean_nation_col)
+        # player_df['Nationality'] = player_df['Nationality'].apply(self.clean_nation_col)
         player_df.drop(labels='Unnamed: 0', axis=1, inplace=True)
         return player_df
 
@@ -413,7 +413,7 @@ class PlayerScrapper:
         self.write_club_html()
         club_df = self.get_club_df()
         club_df['Position'] = club_df['Position'].apply(self.clean_position_col)
-        club_df['Nationality'] = club_df['Nationality'].apply(self.clean_nation_col)
+        # club_df['Nationality'] = club_df['Nationality'].apply(self.clean_nation_col)
         return club_df
 
     def clean_position_col(self, col):
@@ -591,12 +591,14 @@ class DataAnalyzer:
             else:
                 x = x[[stat_x, 'Appearances']]
                 y = y[[stat_y, 'Appearances']]
+                # x[stat_x] = x[stat_x].astype('float')
+                
                 x = x[x['Appearances']>=minimum]
                 y = y[y['Appearances']>=minimum]
-                print(x)
-                print(y)
+
                 x.loc[:, stat_x] = x.loc[:, stat_x].div(x['Appearances'], axis=0)
                 y.loc[:, stat_y] = y.loc[:, stat_y].div(x['Appearances'], axis=0)
+
                 x, y = x[stat_x], y[stat_y]                           
             if avgs:
                 avg_x, avg_y = np.mean(x), np.mean(y)
@@ -611,10 +613,8 @@ class DataAnalyzer:
         if top:
             ax.set_xlim(0, top_num+top_num/10.0)
             ax.set_ylim(0, top_num+top_num/10.0)
-        suffix = ''
-        if per:
-            suffix = 'Per Appearance'
 
+        suffix = ''
         ax.title.set_text(f'{stat_y} vs. {stat_x} {suffix} (Minimum {minimum} Appearance(s))')
         ax.legend()
         fig.show()
@@ -631,8 +631,6 @@ class DataAnalyzer:
             sample_means = self.sample(x)
             ax.hist(sample_means, bins=25, label=position, alpha=0.5)
             dists.append(sample_means)
-        print(np.mean(dists[0]), np.mean(dists[1]))
-        print(stats.ttest_ind(dists[0], dists[1]))
         ax.legend()
         ax.title.set_text('Sampling Distributions of Assists per Appearance')
         ax.set_xlabel('Assists per Appearance')

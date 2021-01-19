@@ -3,3 +3,4 @@ data/epl/epl_players/*
 data/epl/ignore/*
 data/bin/*
 __pycache__/*
+.gitignore
