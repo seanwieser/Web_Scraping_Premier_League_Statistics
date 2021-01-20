@@ -1,4 +1,4 @@
-# **Webscraping Premier League Statistics**
+# **Web Scraping Premier League Statistics**
 
 ## **Goal**:
 Webscrape English Premier League player statistics from 2006-2018
